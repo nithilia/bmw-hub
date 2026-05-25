@@ -1348,9 +1348,10 @@ async function sendChat() {
 // PWA Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('https://base44.app/api/apps/6a1423940cbb3bbcc1939af0/files/mp/public/6a1423940cbb3bbcc1939af0/b45f29825_sw.js').then(reg => {
-      console.log('SW registered');
-    }).catch(err => console.log('SW error:', err));
+    // Unregister any old service workers to avoid caching issues
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(r => r.unregister());
+    });
   });
 }
 
