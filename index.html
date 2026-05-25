@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BMW Owners Hub – Din komplette BMW-ressurs</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="https://base44.app/api/apps/6a1423940cbb3bbcc1939af0/files/mp/public/6a1423940cbb3bbcc1939af0/599e926a8_manifest.json">
+  <meta name="theme-color" content="#0d0d0d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BMW Hub">
+  <link rel="apple-touch-icon" href="https://base44.app/api/apps/6a1423940cbb3bbcc1939af0/files/mp/public/6a1423940cbb3bbcc1939af0/e24c5d466_apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="https://base44.app/api/apps/6a1423940cbb3bbcc1939af0/files/mp/public/6a1423940cbb3bbcc1939af0/754f6a2a7_icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="https://base44.app/api/apps/6a1423940cbb3bbcc1939af0/files/mp/public/6a1423940cbb3bbcc1939af0/8317b678a_icon-512.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bmw-blue: #1c69d4;
+      --bmw-light-blue: #4a90d9;
+      --bg-dark: #0d0d0d;
+      --bg-card: #1a1a1a;
+      --bg-card2: #222222;
+      --text-primary: #f0f0f0;
+      --text-secondary: #a0a0a0;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
+
+    nav {
+      background: rgba(13,13,13,0.97); backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(28,105,212,0.3);
+      padding: 0 2rem; display: flex; align-items: center; justify-content: space-between;
+      height: 64px; position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .nav-title { font-size: 1.2rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
+    .nav-title span { color: var(--bmw-blue); }
+    .nav-links { display: flex; gap: 0; list-style: none; }
+    .nav-links a { color: var(--text-secondary); text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem; font-weight: 500; transition: all 0.2s; cursor: pointer; }
+    .nav-links a:hover, .nav-links a.active { color: #fff; background: rgba(28,105,212,0.2); }
+    .nav-premium-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; padding: 7px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: none; font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; }
+    .nav-premium-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,158,11,0.3); }
+
+    .search-input { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 7px 14px; border-radius: 20px; font-size: 0.85rem; font-family: inherit; width: 220px; transition: all 0.2s; }
+    .search-input::placeholder { color: var(--text-secondary); }
+    .search-input:focus { outline: none; border-color: var(--bmw-blue); width: 260px; }
+
+    /* PREMIUM GATE */
+    .premium-gate {
+      position: relative; overflow: hidden; border-radius: 12px;
+    }
+    .premium-blur { filter: blur(4px); pointer-events: none; user-select: none; opacity: 0.4; }
+    .premium-overlay {
+      position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); border-radius: 12px; z-index: 10; padding: 2rem; text-align: center;
+    }
+    .premium-overlay h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .premium-overlay p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+
+    /* PAYMENT MODAL */
+    .payment-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 500; align-items: center; justify-content: center; padding: 1rem; }
+    .payment-modal-overlay.open { display: flex; }
+    .payment-modal { background: #111; border: 1px solid rgba(28,105,212,0.4); border-radius: 20px; padding: 2.5rem; max-width: 480px; width: 100%; text-align: center; position: relative; }
+    .payment-modal-close { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.08); border: none; color: var(--text-secondary); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+    .payment-modal-close:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+    .price-badge { background: linear-gradient(135deg, rgba(28,105,212,0.2), rgba(28,105,212,0.05)); border: 1px solid rgba(28,105,212,0.3); border-radius: 16px; padding: 1.5rem; margin: 1.5rem 0; }
+    .price-amount { font-size: 3rem; font-weight: 800; color: #fff; }
+    .price-period { font-size: 1rem; color: var(--text-secondary); }
+    .feature-list { list-style: none; text-align: left; margin: 1.5rem 0; }
+    .feature-list li { display: flex; align-items: center; gap: 10px; padding: 0.4rem 0; font-size: 0.9rem; color: #ddd; }
+    .feature-list li::before { content: "✅"; }
+    .checkout-btn { display: block; width: 100%; background: linear-gradient(135deg, #1c69d4, #1557b0); color: white; padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: 700; text-decoration: none; border: none; cursor: pointer; font-family: inherit; transition: all 0.2s; margin-top: 1rem; }
+    .checkout-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(28,105,212,0.4); }
+    .secure-badge { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
+
+    /* SUCCESS BANNER */
+    .success-banner { background: linear-gradient(135deg, #064e3b, #065f46); border: 1px solid #10b981; border-radius: 12px; padding: 1rem 1.5rem; margin: 1rem 2rem; display: none; align-items: center; gap: 1rem; }
+    .success-banner.show { display: flex; }
+
+    /* SECTIONS */
+    .section { display: none; padding: 3rem 2rem; max-width: 1200px; margin: 0 auto; }
+    .section.active { display: block; }
+    .section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .section-title span { color: var(--bmw-blue); }
+    .section-subtitle { color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem; }
+    #search-section { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+    #search-section.active { display: block; }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+    .card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.5rem; transition: all 0.3s; cursor: pointer; }
+    .card:hover { border-color: rgba(28,105,212,0.5); background: var(--bg-card2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(28,105,212,0.15); }
+    .card-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+    .badge-blue { background: rgba(28,105,212,0.2); color: var(--bmw-blue); }
+    .badge-green { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .badge-yellow { background: rgba(234,179,8,0.15); color: #eab308; }
+    .badge-red { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .badge-purple { background: rgba(168,85,247,0.15); color: #a855f7; }
+    .badge-orange { background: rgba(249,115,22,0.15); color: #f97316; }
+    .badge-gold { background: rgba(245,158,11,0.2); color: #f59e0b; }
+    .card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .card p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5; }
+    .card-meta { display: flex; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.8rem; color: var(--text-secondary); flex-wrap: wrap; }
+
+    .models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
+    .model-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; transition: all 0.3s; }
+    .model-card:hover { border-color: rgba(28,105,212,0.5); box-shadow: 0 8px 32px rgba(28,105,212,0.15); }
+    .model-header { background: linear-gradient(135deg, #0a1628, #1a2540); padding: 1.5rem; }
+    .model-series-badge { display: inline-block; background: var(--bmw-blue); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .model-name { font-size: 1.2rem; font-weight: 700; }
+    .model-year { font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px; }
+    .model-body { padding: 1.5rem; }
+    .model-body p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; }
+    .model-engines { background: rgba(28,105,212,0.08); border: 1px solid rgba(28,105,212,0.2); border-radius: 8px; padding: 0.75rem; font-size: 0.8rem; color: #4a90d9; line-height: 1.6; }
+    .model-engines strong { display: block; color: var(--text-secondary); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+
+    .parts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+    .country-flag { font-size: 0.75rem; color: var(--text-secondary); background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 10px; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; backdrop-filter: blur(4px); padding: 2rem; overflow-y: auto; }
+    .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+    .modal { background: #1a1a1a; border: 1px solid rgba(28,105,212,0.3); border-radius: 16px; padding: 2rem; max-width: 700px; width: 100%; margin: auto; position: relative; }
+    .modal-close { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.08); border: none; color: var(--text-secondary); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+    .modal-close:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+    .modal h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; padding-right: 2.5rem; }
+    .modal-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .modal-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; background: rgba(28,105,212,0.06); border: 1px solid rgba(28,105,212,0.15); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+    .meta-item { text-align: center; }
+    .meta-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 4px; }
+    .meta-value { font-size: 0.9rem; font-weight: 600; }
+    .section-block { margin-bottom: 1.5rem; }
+    .section-block h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--bmw-blue); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(28,105,212,0.2); }
+    .section-block p, .section-block ol { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; }
+    .section-block ol { padding-left: 1.5rem; }
+    .section-block li { margin-bottom: 0.4rem; }
+    .tip-box { background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.2); border-radius: 8px; padding: 1rem; font-size: 0.875rem; color: #d4af37; line-height: 1.6; }
+
+    .filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .filter-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .filter-btn:hover, .filter-btn.active { background: rgba(28,105,212,0.2); border-color: var(--bmw-blue); color: #fff; }
+
+    .diagram-preview { background: linear-gradient(135deg, #0a1628, #111827); border-radius: 8px; height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; border: 1px solid rgba(28,105,212,0.15); font-size: 3rem; color: rgba(28,105,212,0.4); }
+
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--bmw-blue); color: white; padding: 8px 18px; border-radius: 8px; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; font-family: inherit; }
+    .btn-primary:hover { background: #2577e8; transform: translateY(-1px); }
+    .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); color: var(--text-secondary); padding: 8px 18px; border-radius: 8px; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-family: inherit; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    .admin-form { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .admin-form h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--bmw-blue); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+    input[type=text], select, textarea { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.875rem; font-family: inherit; transition: all 0.2s; }
+    input[type=text]:focus, select:focus, textarea:focus { outline: none; border-color: var(--bmw-blue); }
+    textarea { min-height: 100px; resize: vertical; }
+    select option { background: #1a1a1a; }
+    .admin-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .admin-tab { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); padding: 8px 20px; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .admin-tab:hover, .admin-tab.active { background: var(--bmw-blue); border-color: var(--bmw-blue); color: #fff; }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+    .success-msg { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.875rem; margin-top: 1rem; display: none; }
+
+    .hero { background: linear-gradient(135deg, #0a1628 0%, #0d0d0d 50%, #0a0a1a 100%); padding: 80px 2rem; text-align: center; position: relative; overflow: hidden; border-bottom: 1px solid rgba(28,105,212,0.2); }
+    .hero::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(28,105,212,0.08) 0%, transparent 60%); pointer-events: none; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
+    .hero h1 span { color: var(--bmw-blue); }
+    .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 2rem; line-height: 1.6; }
+    .hero-stats { display: flex; justify-content: center; gap: 3rem; margin-top: 2.5rem; }
+    .stat-number { font-size: 2rem; font-weight: 800; color: var(--bmw-blue); }
+    .stat-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+
+    footer { text-align: center; padding: 2rem; border-top: 1px solid rgba(255,255,255,0.06); color: var(--text-secondary); font-size: 0.85rem; margin-top: 4rem; }
+    @media (max-width: 768px) {
+      nav { padding: 0 1rem; }
+      .nav-links, .search-input { display: none; }
+      .hero { padding: 50px 1.5rem; }
+      .hero-stats { gap: 1.5rem; }
+      .section { padding: 2rem 1rem; }
+      .cards-grid, .models-grid, .parts-grid { grid-template-columns: 1fr; }
+      .modal-meta { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13,13,13,0.97); border-top: 1px solid rgba(28,105,212,0.3); padding: 0.75rem 1rem; z-index: 100; }
+    @media (max-width: 768px) { .mobile-nav { display: flex; justify-content: space-around; } body { padding-bottom: 70px; } }
+    .mobile-nav a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-secondary); text-decoration: none; font-size: 0.68rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .mobile-nav a.active { color: var(--bmw-blue); }
+    .mobile-nav a span.icon { font-size: 1.2rem; }
+  
+    /* SKILTOPPSLAG */
+    .regnr-input-wrap { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; }
+    .regnr-input { background: rgba(255,255,255,0.07); border: 2px solid rgba(255,255,255,0.15); color: #fff; padding: 14px 20px; border-radius: 12px; font-size: 1.3rem; font-weight: 800; font-family: inherit; letter-spacing: 3px; text-transform: uppercase; width: 200px; transition: all 0.2s; text-align: center; }
+    .regnr-input::placeholder { color: rgba(255,255,255,0.25); letter-spacing: 2px; font-size: 1.1rem; }
+    .regnr-input:focus { outline: none; border-color: var(--bmw-blue); background: rgba(28,105,212,0.08); }
+    .regnr-search-btn { background: var(--bmw-blue); color: white; border: none; padding: 14px 28px; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .regnr-search-btn:hover { background: #2577e8; transform: translateY(-1px); }
+    .regnr-search-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .bil-kort { background: linear-gradient(135deg, #0a1628, #1a2540); border: 1px solid rgba(28,105,212,0.4); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; }
+    .bil-skilt { background: #f5c518; color: #000; padding: 10px 20px; border-radius: 8px; font-size: 1.6rem; font-weight: 900; letter-spacing: 4px; display: inline-block; margin-bottom: 1.5rem; border: 3px solid #111; }
+    .bil-info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .bil-info-item { background: rgba(255,255,255,0.06); border-radius: 8px; padding: 0.75rem 1rem; }
+    .bil-info-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 4px; }
+    .bil-info-value { font-size: 1rem; font-weight: 600; color: #fff; }
+    .bil-action-section { background: rgba(28,105,212,0.06); border: 1px solid rgba(28,105,212,0.2); border-radius: 12px; padding: 1.5rem; }
+    .bil-action-section h3 { font-size: 1rem; font-weight: 600; color: var(--bmw-blue); margin-bottom: 1rem; }
+    .regnr-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 1rem 1.5rem; color: #f87171; font-size: 0.9rem; margin-bottom: 1rem; display: none; }
+    .regnr-loading { display: none; align-items: center; gap: 0.75rem; color: var(--text-secondary); padding: 1rem; }
+    .spinner { width: 20px; height: 20px; border: 2px solid rgba(28,105,212,0.3); border-top-color: var(--bmw-blue); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+  
+    /* BMW AI CHAT */
+    #bmw-chat-btn {
+      position: fixed; bottom: 5.5rem; right: 1.5rem; width: 56px; height: 56px;
+      background: linear-gradient(135deg, #1c69d4, #1557b0);
+      border-radius: 50%; border: none; cursor: pointer; z-index: 900;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(28,105,212,0.5);
+      transition: all 0.3s; font-size: 1.4rem;
+    }
+    #bmw-chat-btn:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(28,105,212,0.7); }
+    #bmw-chat-btn .chat-badge {
+      position: absolute; top: -4px; right: -4px; background: #ef4444;
+      color: white; border-radius: 50%; width: 18px; height: 18px;
+      font-size: 0.65rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
+    #bmw-chat-window {
+      position: fixed; bottom: 8rem; right: 1.5rem; width: 360px; max-width: calc(100vw - 2rem);
+      height: 500px; max-height: calc(100vh - 10rem);
+      background: #111; border: 1px solid rgba(28,105,212,0.4);
+      border-radius: 20px; z-index: 901; display: none; flex-direction: column;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.7); overflow: hidden;
+    }
+    #bmw-chat-window.open { display: flex; }
+    .chat-header {
+      background: linear-gradient(135deg, #0a1628, #1a2540);
+      padding: 1rem 1.25rem; display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid rgba(28,105,212,0.2);
+    }
+    .chat-header-avatar {
+      width: 36px; height: 36px; background: linear-gradient(135deg,#1c69d4,#1557b0);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .chat-header-info { flex: 1; }
+    .chat-header-info strong { display: block; font-size: 0.95rem; color: #fff; }
+    .chat-header-info span { font-size: 0.75rem; color: #22c55e; }
+    .chat-close-btn { background: rgba(255,255,255,0.08); border: none; color: #a0a0a0; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+    .chat-close-btn:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;
+      scrollbar-width: thin; scrollbar-color: rgba(28,105,212,0.3) transparent;
+    }
+    .chat-msg { max-width: 85%; }
+    .chat-msg.user { align-self: flex-end; }
+    .chat-msg.bot { align-self: flex-start; }
+    .chat-bubble {
+      padding: 0.65rem 1rem; border-radius: 16px; font-size: 0.875rem; line-height: 1.5;
+    }
+    .chat-msg.user .chat-bubble { background: linear-gradient(135deg,#1c69d4,#1557b0); color: #fff; border-bottom-right-radius: 4px; }
+    .chat-msg.bot .chat-bubble { background: #1e1e1e; color: #e0e0e0; border: 1px solid rgba(255,255,255,0.08); border-bottom-left-radius: 4px; }
+    .chat-typing { display: flex; gap: 4px; padding: 0.5rem 0.75rem; }
+    .chat-typing span { width: 7px; height: 7px; background: #4a90d9; border-radius: 50%; animation: typing 1.2s infinite; }
+    .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+    .chat-input-area {
+      padding: 0.75rem 1rem; border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex; gap: 0.5rem; align-items: flex-end;
+    }
+    .chat-input {
+      flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      color: #fff; padding: 0.6rem 0.9rem; border-radius: 12px; font-size: 0.875rem;
+      font-family: inherit; resize: none; max-height: 100px; line-height: 1.4;
+    }
+    .chat-input:focus { outline: none; border-color: rgba(28,105,212,0.5); }
+    .chat-input::placeholder { color: #555; }
+    .chat-send-btn {
+      background: linear-gradient(135deg,#1c69d4,#1557b0); border: none; color: #fff;
+      width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s;
+    }
+    .chat-send-btn:hover { transform: scale(1.05); }
+    .chat-suggestions { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 1rem 0.75rem; }
+    .chat-suggestion-chip {
+      background: rgba(28,105,212,0.15); border: 1px solid rgba(28,105,212,0.3);
+      color: #4a90d9; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .chat-suggestion-chip:hover { background: rgba(28,105,212,0.3); color: #fff; }
+
+
+    .nav-auth-btn {
+      background: transparent;
+      border: 1px solid #1c69d4;
+      color: #1c69d4;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .nav-auth-btn:hover { background: #1c69d4; color: #fff; }
+    .nav-logout-btn {
+      background: transparent;
+      border: 1px solid #ff6b6b;
+      color: #ff6b6b;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .nav-logout-btn:hover { background: #ff6b6b; color: #fff; }
+    .nav-user-info { display: flex; align-items: center; gap: 10px; color: #ccc; font-size: 13px; }
+
+  </style>
+</head>
+<body>
+
+<!-- Auth Modal -->
+<div id="auth-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;" onclick="if(event.target===this)closeAuthModal()">
+  <div style="background:#1a1a2e;border:1px solid #1c69d4;border-radius:16px;padding:32px;width:min(400px,90vw);position:relative;">
+    <button onclick="closeAuthModal()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:#aaa;font-size:22px;cursor:pointer;">✕</button>
+
+    <!-- Login form -->
+    <div id="auth-login-form">
+      <h2 style="color:#1c69d4;margin:0 0 8px">🔑 Logg inn</h2>
+      <p style="color:#aaa;margin:0 0 20px;font-size:14px">Logg inn for å få tilgang til din konto</p>
+      <input id="login-email" type="email" placeholder="E-post" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#0d0d1a;color:#fff;margin-bottom:10px;box-sizing:border-box;" />
+      <input id="login-password" type="password" placeholder="Passord" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#0d0d1a;color:#fff;margin-bottom:6px;box-sizing:border-box;" onkeydown="if(event.key==='Enter')doLogin()" />
+      <div style="text-align:right;margin-bottom:16px">
+        <a href="#" onclick="showForgotForm()" style="color:#1c69d4;font-size:13px;text-decoration:none;">Glemt passord?</a>
+      </div>
+      <div id="login-error" style="color:#ff6b6b;font-size:13px;margin-bottom:10px;display:none"></div>
+      <button onclick="doLogin()" style="width:100%;padding:13px;background:linear-gradient(135deg,#1c69d4,#1557b0);color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;font-weight:600;">Logg inn</button>
+      <p style="color:#aaa;text-align:center;margin:16px 0 0;font-size:14px">Har du ikke konto? <a href="#" onclick="showRegisterForm()" style="color:#1c69d4;text-decoration:none;">Registrer deg</a></p>
+    </div>
+
+    <!-- Register form -->
+    <div id="auth-register-form" style="display:none">
+      <h2 style="color:#1c69d4;margin:0 0 8px">🚗 Opprett konto</h2>
+      <p style="color:#aaa;margin:0 0 20px;font-size:14px">Gratis konto – Premium aktiveres etter betaling</p>
+      <input id="reg-name" type="text" placeholder="Navn (valgfritt)" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#0d0d1a;color:#fff;margin-bottom:10px;box-sizing:border-box;" />
+      <input id="reg-email" type="email" placeholder="E-post" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#0d0d1a;color:#fff;margin-bottom:10px;box-sizing:border-box;" />
+      <input id="reg-password" type="password" placeholder="Passord (min. 8 tegn)" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#0d0d1a;color:#fff;margin-bottom:16px;box-sizing:border-box;" onkeydown="if(event.key==='Enter')doRegister()" />
+      <div id="reg-error" style="color:#ff6b6b;font-size:13px;margin-bottom:10px;display:none"></div>
+      <button onclick="doRegister()" style="width:100%;padding:13px;background:linear-gradient(135deg,#1c69d4,#1557b0);color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;font-weight:600;">Opprett konto</button>
+      <p style="color:#aaa;text-align:center;margin:16px 0 0;font-size:14px">Har du konto? <a href="#" onclick="showLoginForm()" style="color:#1c69d4;text-decoration:none;">Logg inn</a></p>
+    </div>
+
+    <!-- Forgot password form -->
+    <div id="auth-forgot-form" style="display:none">
+      <h2 style="color:#1c69d4;margin:0 0 8px">🔒 Glemt passord</h2>
+      <p style="color:#aaa;margin:0 0 20px;font-size:14px">Vi sender deg en lenke for å tilbakestille passordet</p>
+      <input id="forgot-email" type="email" placeholder="E-post" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#0d0d1a;color:#fff;margin-bottom:16px;box-sizing:border-box;" onkeydown="if(event.key==='Enter')doForgotPassword()" />
+      <div id="forgot-msg" style="font-size:13px;margin-bottom:10px;display:none"></div>
+      <button onclick="doForgotPassword()" style="width:100%;padding:13px;background:linear-gradient(135deg,#1c69d4,#1557b0);color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;font-weight:600;">Send tilbakestillingslenke</button>
+      <p style="color:#aaa;text-align:center;margin:16px 0 0;font-size:14px"><a href="#" onclick="showLoginForm()" style="color:#1c69d4;text-decoration:none;">← Tilbake til innlogging</a></p>
+    </div>
+
+    <!-- Reset password form -->
+    <div id="auth-reset-form" style="display:none">
+      <h2 style="color:#1c69d4;margin:0 0 8px">🔑 Nytt passord</h2>
+      <p style="color:#aaa;margin:0 0 20px;font-size:14px">Velg et nytt passord for kontoen din</p>
+      <input id="reset-password" type="password" placeholder="Nytt passord (min. 8 tegn)" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#0d0d1a;color:#fff;margin-bottom:10px;box-sizing:border-box;" />
+      <input id="reset-password2" type="password" placeholder="Bekreft nytt passord" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#0d0d1a;color:#fff;margin-bottom:16px;box-sizing:border-box;" onkeydown="if(event.key==='Enter')doResetPassword()" />
+      <div id="reset-msg" style="font-size:13px;margin-bottom:10px;display:none"></div>
+      <button onclick="doResetPassword()" style="width:100%;padding:13px;background:linear-gradient(135deg,#1c69d4,#1557b0);color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;font-weight:600;">Lagre nytt passord</button>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-logo" onclick="showSection('hjem')">
+    <svg width="38" height="38" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="19" fill="none" stroke="#1c69d4" stroke-width="2"/>
+      <path d="M20,5 L20,20 L5,20 A15,15,0,0,1,20,5 Z" fill="#1c69d4"/>
+      <path d="M35,20 L20,20 L20,35 A15,15,0,0,0,35,20 Z" fill="#1c69d4"/>
+      <path d="M20,5 L35,20 A15,15,0,0,0,20,5 Z" fill="white"/>
+      <path d="M5,20 L20,35 A15,15,0,0,1,5,20 Z" fill="white"/>
+      <circle cx="20" cy="20" r="15" fill="none" stroke="#1c69d4" stroke-width="1"/>
+    </svg>
+    <span class="nav-title">BMW <span>Owners Hub</span></span>
+  </div>
+  <ul class="nav-links">
+    <li><a onclick="showSection('hjem')" class="active" id="nav-hjem">🏠 Hjem</a></li>
+    <li><a onclick="showSection('modeller')" id="nav-modeller">🚗 Modeller</a></li>
+    <li><a onclick="showSection('tegninger')" id="nav-tegninger">📐 Tegninger</a></li>
+    <li><a onclick="showSection('guider')" id="nav-guider">🔧 Reparasjon</a></li>
+    <li><a onclick="showSection('deler')" id="nav-deler">🛒 Deler</a></li>
+    <li><a onclick="showSection('minbmw')" id="nav-minbmw">🔑 Min BMW</a></li>
+    <li><a onclick="showSection('admin')" id="nav-admin">⚙️ Admin</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem">
+    <input type="text" class="search-input" placeholder="🔍 Søk..." id="global-search" oninput="globalSearch(this.value)"/>
+    <button class="nav-premium-btn" onclick="openPaymentModal()" id="premium-nav-btn">⭐ Bli Premium – 99 kr/mnd</button>
+    <button class="nav-auth-btn" onclick="openAuthModal()" id="nav-auth-btn">👤 Logg inn</button>
+    <div class="nav-user-info" id="nav-user-info" style="display:none">
+      <span id="nav-user-name"></span>
+      <button class="nav-logout-btn" onclick="logoutUser()">Logg ut</button>
+    </div>
+  </div>
+</nav>
+
+<!-- SUCCESS BANNER -->
+<div class="success-banner" id="success-banner">
+  <span style="font-size:1.5rem">🎉</span>
+  <div>
+    <strong style="color:#10b981">Velkommen som Premium-medlem!</strong>
+    <p style="font-size:0.85rem;color:#6ee7b7;margin-top:2px">Du har nå full tilgang til alle guider, tegninger og admin-panel.</p>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div id="search-section">
+  <h2 class="section-title">🔍 Søkeresultater for "<span id="search-query-label"></span>"</h2>
+  <p class="section-subtitle" id="search-count"></p>
+  <div id="search-results"></div>
+</div>
+
+<!-- HERO -->
+<div id="hero-section">
+  <div class="hero">
+    <h1>Din komplette<br><span>BMW-ressurs</span></h1>
+    <p>Deletegninger, reparasjonsguider og delebutikker — alt du trenger for å holde BMWen din på veien.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <button class="btn-primary" onclick="showSection('guider')">🔧 Reparasjonsguider</button>
+      <button class="btn-secondary" onclick="showSection('tegninger')">📐 Deletegninger</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-number">15</div><div class="stat-label">BMW-modeller</div></div>
+      <div class="stat"><div class="stat-number">10</div><div class="stat-label">Reparasjonsguider</div></div>
+      <div class="stat"><div class="stat-number">12</div><div class="stat-label">Delebutikker</div></div>
+    </div>
+  </div>
+
+  <!-- PREMIUM BANNER ON HERO -->
+  <div style="max-width:1200px;margin:2.5rem auto 0;padding:0 2rem" id="premium-hero-banner">
+    <div style="background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(217,119,6,0.08));border:1px solid rgba(245,158,11,0.3);border-radius:16px;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <div>
+        <div style="font-size:1.1rem;font-weight:700;color:#f59e0b;margin-bottom:0.3rem">⭐ BMW Owners Hub Premium</div>
+        <div style="font-size:0.9rem;color:var(--text-secondary)">Full tilgang til alle guider, deletegninger og admin-panel</div>
+      </div>
+      <button class="nav-premium-btn" onclick="openPaymentModal()" style="font-size:0.95rem;padding:10px 24px">Kom i gang – 99 kr/mnd →</button>
+    </div>
+  </div>
+
+  <div style="max-width:1200px;margin:2.5rem auto;padding:0 2rem">
+    <div class="cards-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+      <div class="card" onclick="showSection('modeller')"><div style="font-size:2.5rem;margin-bottom:0.75rem">🚗</div><h3>BMW-modeller</h3><p>15 modeller med spesifikasjoner og motorvalg.</p></div>
+      <div class="card" onclick="showSection('tegninger')"><div style="font-size:2.5rem;margin-bottom:0.75rem">📐</div><h3>Deletegninger</h3><p>Eksplosjonsskisser og OEM-katalog med delenummer.</p></div>
+      <div class="card" onclick="showSection('guider')"><div style="font-size:2.5rem;margin-bottom:0.75rem">🔧</div><h3>Gjør-det-selv</h3><p>10 steg-for-steg reparasjonsguider.</p></div>
+      <div class="card" onclick="showSection('deler')"><div style="font-size:2.5rem;margin-bottom:0.75rem">🛒</div><h3>Delebutikker</h3><p>Norske og internasjonale butikker for alle behov.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODELLER -->
+<div class="section" id="section-modeller">
+  <h2 class="section-title">BMW <span>Modeller</span></h2>
+  <p class="section-subtitle">Populære BMW-modeller med spesifikasjoner og motoralternativer</p>
+  <div class="filter-bar" id="model-filters">
+    <button class="filter-btn active" onclick="filterModels('alle',this)">Alle</button>
+    <button class="filter-btn" onclick="filterModels('1-serie',this)">1-serie</button>
+    <button class="filter-btn" onclick="filterModels('2-serie',this)">2-serie</button>
+    <button class="filter-btn" onclick="filterModels('3-serie',this)">3-serie</button>
+    <button class="filter-btn" onclick="filterModels('4-serie',this)">4-serie</button>
+    <button class="filter-btn" onclick="filterModels('5-serie',this)">5-serie</button>
+    <button class="filter-btn" onclick="filterModels('7-serie',this)">7-serie</button>
+    <button class="filter-btn" onclick="filterModels('X-serie',this)">X-serie</button>
+    <button class="filter-btn" onclick="filterModels('M-serie',this)">M-serie</button>
+  </div>
+  <div class="models-grid" id="models-grid"></div>
+</div>
+
+<!-- TEGNINGER -->
+<div class="section" id="section-tegninger">
+  <h2 class="section-title">📐 <span>Deletegninger</span></h2>
+  <p class="section-subtitle">Eksplosjonsskisser og OEM-delekatalog med originale delenummer</p>
+  <div style="background:rgba(28,105,212,0.08);border:1px solid rgba(28,105,212,0.2);border-radius:12px;padding:1.5rem;margin-bottom:2rem">
+    <h3 style="color:var(--bmw-blue);margin-bottom:0.75rem">🔍 Offisielle BMW-kataloger</h3>
+    <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:1rem">For eksakte delenummer og eksplosjonsskisser:</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="https://www.realoem.com" target="_blank" class="btn-primary">🌐 RealOEM.com →</a>
+      <a href="https://www.bmwfans.info" target="_blank" class="btn-secondary">📊 BMWFans.info →</a>
+      <a href="https://www.epc.bmw.com" target="_blank" class="btn-secondary">📐 BMW EPC →</a>
+    </div>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterDiagrams('alle',this)">Alle</button>
+    <button class="filter-btn" onclick="filterDiagrams('Bremser',this)">🛑 Bremser</button>
+    <button class="filter-btn" onclick="filterDiagrams('Motor',this)">⚙️ Motor</button>
+    <button class="filter-btn" onclick="filterDiagrams('Fjæring',this)">🔩 Fjæring</button>
+    <button class="filter-btn" onclick="filterDiagrams('Transmisjon',this)">⚡ Transmisjon</button>
+    <button class="filter-btn" onclick="filterDiagrams('Avgassystem',this)">💨 Avgass</button>
+    <button class="filter-btn" onclick="filterDiagrams('Kjøling',this)">🌡️ Kjøling</button>
+  </div>
+  <div id="diagrams-grid" class="cards-grid"></div>
+</div>
+
+<!-- GUIDER -->
+<div class="section" id="section-guider">
+  <h2 class="section-title">🔧 <span>Reparasjonsguider</span></h2>
+  <p class="section-subtitle">Steg-for-steg guider for DIY-reparasjoner på din BMW. <span id="premium-guide-hint" style="color:#f59e0b">⭐ Premium-innhold er merket med gull.</span></p>
+  <div class="filter-bar" id="guide-filters">
+    <button class="filter-btn active" onclick="filterGuides('alle',this)">Alle</button>
+    <button class="filter-btn" onclick="filterGuides('cat:Motor',this)">⚙️ Motor</button>
+    <button class="filter-btn" onclick="filterGuides('cat:Bremser',this)">🛑 Bremser</button>
+    <button class="filter-btn" onclick="filterGuides('cat:Fjæring',this)">🔩 Fjæring</button>
+    <button class="filter-btn" onclick="filterGuides('cat:Kjøling',this)">🌡️ Kjøling</button>
+    <button class="filter-btn" onclick="filterGuides('cat:Elektrisk',this)">⚡ Elektrisk</button>
+    <button class="filter-btn" onclick="filterGuides('cat:Elektrikk',this)">⚡ Elektrikk</button>
+    <button class="filter-btn" onclick="filterGuides('diff:Enkel',this)">✅ Enkel</button>
+    <button class="filter-btn" onclick="filterGuides('diff:Middels',this)">🟡 Middels</button>
+    <button class="filter-btn" onclick="filterGuides('diff:Avansert',this)">🔥 Avansert</button>
+  </div>
+  <div class="cards-grid" id="guides-grid"></div>
+</div>
+
+<!-- DELER -->
+<div class="section" id="section-deler">
+  <h2 class="section-title">🛒 <span>Delebutikker</span></h2>
+  <p class="section-subtitle">De beste nettbutikkene for BMW-deler — norske og internasjonale</p>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterParts('alle',this)">Alle</button>
+    <button class="filter-btn" onclick="filterParts('OEM deler',this)">OEM</button>
+    <button class="filter-btn" onclick="filterParts('Ettermarked',this)">Ettermarked</button>
+    <button class="filter-btn" onclick="filterParts('Bruktdeler',this)">Bruktdeler</button>
+    <button class="filter-btn" onclick="filterParts('Tilbehør',this)">Tilbehør</button>
+    <button class="filter-btn" onclick="filterParts('Verktøy',this)">Verktøy</button>
+  </div>
+  <div class="parts-grid" id="parts-grid"></div>
+</div>
+
+
+<!-- MIN BMW SKILTOPPSLAG -->
+<div class="section" id="section-minbmw">
+  <h2 class="section-title">🔑 <span>Min BMW</span></h2>
+  <p class="section-subtitle">Skriv inn registreringsnummeret ditt for å få innhold tilpasset akkurat din bil</p>
+
+  <div class="regnr-input-wrap">
+    <input type="text" class="regnr-input" id="regnr-input" placeholder="AB 12345" maxlength="8"
+      oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')slåOppBil()"/>
+    <button class="regnr-search-btn" onclick="slåOppBil()" id="regnr-btn">🔍 Slå opp</button>
+    <button class="btn-secondary" onclick="nullstillBil()" id="regnr-clear" style="display:none">✕ Nullstill</button>
+  </div>
+
+  <div class="regnr-error" id="regnr-error"></div>
+  <div class="regnr-loading" id="regnr-loading"><div class="spinner"></div> Henter bilinfo fra Vegvesen…</div>
+
+  <div id="bil-resultat" style="display:none">
+    <div class="bil-kort" id="bil-kort"></div>
+    <div id="bil-guider-seksjon"></div>
+    <div id="bil-tegninger-seksjon"></div>
+  </div>
+
+  <div id="regnr-intro" style="text-align:center;padding:3rem 1rem;color:var(--text-secondary)">
+    <div style="font-size:4rem;margin-bottom:1rem">🚗</div>
+    <h3 style="font-size:1.2rem;font-weight:600;color:#fff;margin-bottom:0.5rem">Finn innhold for din BMW</h3>
+    <p style="max-width:400px;margin:0 auto;line-height:1.6">Skriv inn registreringsnummeret ditt så finner vi modell, årsmodell og motortype — og filtrerer guider og tegninger automatisk.</p>
+    <div style="margin-top:1.5rem;padding:1rem;background:rgba(255,255,255,0.04);border-radius:10px;display:inline-block;font-size:0.8rem">
+      💡 <strong style="color:#fff">Tips:</strong> Appen husker bilen din i nettleseren til neste gang
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="section" id="section-admin">
+  <h2 class="section-title">⚙️ <span>Admin-panel</span></h2>
+  <p class="section-subtitle">Legg til egne modeller, guider, deletegninger og delelenker</p>
+  <div id="admin-gate-msg" style="display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:2rem">
+    <div style="font-size:1.5rem;margin-bottom:0.5rem">🔒</div>
+    <h3 style="color:#f59e0b;margin-bottom:0.5rem">Premium-funksjon</h3>
+    <p style="color:var(--text-secondary);margin-bottom:1rem">Admin-panelet er kun tilgjengelig for Premium-medlemmer.</p>
+    <button class="nav-premium-btn" onclick="openPaymentModal()" style="padding:10px 24px;font-size:0.95rem">⭐ Bli Premium – 99 kr/mnd</button>
+  </div>
+  <div id="admin-content">
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="showAdminPanel('guide-panel',this)">🔧 Guide</button>
+      <button class="admin-tab" onclick="showAdminPanel('model-panel',this)">🚗 Modell</button>
+      <button class="admin-tab" onclick="showAdminPanel('diagram-panel',this)">📐 Tegning</button>
+      <button class="admin-tab" onclick="showAdminPanel('parts-panel',this)">🛒 Delebutikk</button>
+    </div>
+    <div class="admin-panel active" id="guide-panel">
+      <div class="admin-form">
+        <h3>🔧 Ny reparasjonsguide</h3>
+        <div class="form-row">
+          <div class="form-group"><label>Tittel</label><input type="text" id="g-title" placeholder="f.eks. Bytte støtdempere bak"></div>
+          <div class="form-group"><label>Kategori</label><select id="g-cat"><option>Motor</option><option>Bremser</option><option>Fjæring</option><option>Elektrisk</option><option>Kjøling</option><option>Transmisjon</option><option>Karosseri</option><option>Annet</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Vanskelighetsgrad</label><select id="g-diff"><option>Enkel</option><option>Middels</option><option>Avansert</option></select></div>
+          <div class="form-group"><label>Tidsestimat</label><input type="text" id="g-time" placeholder="f.eks. 2-3 timer"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>BMW-modeller</label><input type="text" id="g-models" placeholder="f.eks. E46, E90"></div>
+          <div class="form-group"><label>Verktøy</label><input type="text" id="g-tools" placeholder="f.eks. Jekk, 17mm nøkkel"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:1rem"><label>Fremgangsmåte (ett steg per linje)</label><textarea id="g-steps" placeholder="1. Jekk opp bilen&#10;2. ..."></textarea></div>
+        <div class="form-group" style="margin-bottom:1rem"><label>Tips</label><textarea id="g-tips" placeholder="Husk å..."></textarea></div>
+        <div class="form-group" style="margin-bottom:1rem;flex-direction:row;align-items:center;gap:0.75rem">
+          <input type="checkbox" id="g-premium" style="width:18px;height:18px;accent-color:#f59e0b">
+          <label for="g-premium" style="text-transform:none;font-size:0.9rem;cursor:pointer">⭐ Premium-innhold (kun for betalende brukere)</label>
+        </div>
+        <button class="btn-primary" onclick="addGuide()">➕ Legg til guide</button>
+        <div class="success-msg" id="g-success">✅ Guide lagt til!</div>
+      </div>
+    </div>
+    <div class="admin-panel" id="model-panel">
+      <div class="admin-form">
+        <h3>🚗 Ny BMW-modell</h3>
+        <div class="form-row">
+          <div class="form-group"><label>Modellnavn</label><input type="text" id="m-name" placeholder="f.eks. BMW 3-serie (F30)"></div>
+          <div class="form-group"><label>Serie</label><select id="m-series"><option>1-serie</option><option>2-serie</option><option>3-serie</option><option>4-serie</option><option>5-serie</option><option>6-serie</option><option>7-serie</option><option>X-serie</option><option>M-serie</option><option>Z-serie</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Årsintervall</label><input type="text" id="m-year" placeholder="f.eks. 2012–2019"></div>
+          <div class="form-group"><label>Motoralternativer</label><input type="text" id="m-engines" placeholder="f.eks. 316i, 318i, 320i"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:1rem"><label>Beskrivelse</label><textarea id="m-desc"></textarea></div>
+        <button class="btn-primary" onclick="addModel()">➕ Legg til modell</button>
+        <div class="success-msg" id="m-success">✅ Modell lagt til!</div>
+      </div>
+    </div>
+    <div class="admin-panel" id="diagram-panel">
+      <div class="admin-form">
+        <h3>📐 Ny deletegning</h3>
+        <div class="form-row">
+          <div class="form-group"><label>Tittel</label><input type="text" id="d-title" placeholder="f.eks. E46 Kjølesystem"></div>
+          <div class="form-group"><label>Kategori</label><select id="d-cat"><option>Motor</option><option>Bremser</option><option>Fjæring</option><option>Transmisjon</option><option>Karosseri</option><option>Elektrisk</option><option>Avgassystem</option><option>Kjøling</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>BMW-modeller</label><input type="text" id="d-models"></div>
+          <div class="form-group"><label>Link til kilde</label><input type="text" id="d-url" placeholder="https://www.realoem.com/..."></div>
+        </div>
+        <div class="form-group" style="margin-bottom:1rem"><label>Beskrivelse</label><textarea id="d-desc"></textarea></div>
+        <button class="btn-primary" onclick="addDiagram()">➕ Legg til tegning</button>
+        <div class="success-msg" id="d-success">✅ Tegning lagt til!</div>
+      </div>
+    </div>
+    <div class="admin-panel" id="parts-panel">
+      <div class="admin-form">
+        <h3>🛒 Ny delebutikk</h3>
+        <div class="form-row">
+          <div class="form-group"><label>Butikknavn</label><input type="text" id="p-name"></div>
+          <div class="form-group"><label>Kategori</label><select id="p-cat"><option>OEM deler</option><option>Ettermarked</option><option>Bruktdeler</option><option>Verktøy</option><option>Tilbehør</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Nettadresse</label><input type="text" id="p-url" placeholder="https://..."></div>
+          <div class="form-group"><label>Land</label><input type="text" id="p-country" placeholder="🇳🇴 Norge"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:1rem"><label>Beskrivelse</label><textarea id="p-desc"></textarea></div>
+        <button class="btn-primary" onclick="addPart()">➕ Legg til butikk</button>
+        <div class="success-msg" id="p-success">✅ Butikk lagt til!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GUIDE MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal"><button class="modal-close" onclick="closeModal()">✕</button><div id="modal-content"></div></div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="payment-modal-overlay" id="payment-modal">
+  <div class="payment-modal">
+    <button class="payment-modal-close" onclick="closePaymentModal()">✕</button>
+    <div style="font-size:2.5rem;margin-bottom:0.5rem">⭐</div>
+    <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:0.5rem">BMW Owners Hub Premium</h2>
+    <p style="color:var(--text-secondary);font-size:0.9rem">Full tilgang til alt innhold — ingen begrensninger</p>
+    <div class="price-badge">
+      <div class="price-amount">99 kr</div>
+      <div class="price-period">per måned • avbryt når som helst</div>
+    </div>
+    <ul class="feature-list">
+      <li>Alle 10+ reparasjonsguider med full detalj</li>
+      <li>Komplette deletegninger med delenummer</li>
+      <li>Admin-panel — legg til eget innhold</li>
+      <li>Nye guider og tegninger fortløpende</li>
+      <li>Søk på tvers av alt innhold</li>
+    </ul>
+    <button class="checkout-btn" onclick="startCheckout()" id="checkout-btn">
+      💳 Betal med kort via Stripe →
+    </button>
+    <div class="secure-badge">🔒 Sikker betaling via Stripe &nbsp;|&nbsp; 256-bit kryptering</div>
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <a onclick="showSection('hjem')" id="mobile-hjem" class="active"><span class="icon">🏠</span>Hjem</a>
+  <a onclick="showSection('modeller')" id="mobile-modeller"><span class="icon">🚗</span>Modeller</a>
+  <a onclick="showSection('tegninger')" id="mobile-tegninger"><span class="icon">📐</span>Tegninger</a>
+  <a onclick="showSection('guider')" id="mobile-guider"><span class="icon">🔧</span>Guider</a>
+  <a onclick="showSection('deler')" id="mobile-deler"><span class="icon">🛒</span>Deler</a>
+  <a onclick="showSection('minbmw')" id="mobile-minbmw"><span class="icon">🔑</span>Min BMW</a>
+</div>
+
+<footer><p>BMW Owners Hub — Bygget for BMW-entusiaster 🚗 &nbsp;|&nbsp; Alle merkenavn tilhører BMW AG</p></footer>
+
+<script>
+// ===== PREMIUM STATE =====
+let isPremium = false;
+
+
+const STRIPE_CHECKOUT_URL = 'https://superagent-c1939af0.base44.app/functions/stripeCheckout';
+
+async function startCheckout() {
+  const btn = document.getElementById('checkout-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Kobler til Stripe…';
+  try {
+    const currentUrl = window.location.href.split('?')[0];
+    const res = await fetch(STRIPE_CHECKOUT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        success_url: currentUrl + '?payment=success',
+        cancel_url: currentUrl + '?payment=cancelled'
+      })
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Feil ved oppstart av betaling: ' + (data.error || 'Ukjent feil'));
+      btn.disabled = false;
+      btn.textContent = '💳 Betal med kort via Stripe →';
+    }
+  } catch (e) {
+    alert('Nettverksfeil: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = '💳 Betal med kort via Stripe →';
+  }
+}
+
+function checkPremium() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('premium') === '1') {
+    isPremium = true;
+    localStorage.setItem('bmw_premium', '1');
+    document.getElementById('success-banner').classList.add('show');
+    setTimeout(() => document.getElementById('success-banner').classList.remove('show'), 6000);
+    // Clean URL
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+  if (localStorage.getItem('bmw_premium') === '1') {
+    isPremium = true;
+  }
+  updatePremiumUI();
+}
+
+function updatePremiumUI() {
+  const btn = document.getElementById('premium-nav-btn');
+  const heroBanner = document.getElementById('premium-hero-banner');
+  if (isPremium) {
+    btn.textContent = '⭐ Premium aktiv';
+    btn.style.background = 'linear-gradient(135deg, #065f46, #047857)';
+    btn.style.color = '#fff';
+    btn.onclick = null;
+    btn.style.cursor = 'default';
+    if (heroBanner) heroBanner.style.display = 'none';
+    document.getElementById('premium-guide-hint').style.display = 'none';
+  }
+  // Admin gate
+  const gateMsg = document.getElementById('admin-gate-msg');
+  const adminContent = document.getElementById('admin-content');
+  if (!isPremium) {
+    gateMsg.style.display = 'block';
+    adminContent.style.display = 'none';
+  } else {
+    gateMsg.style.display = 'none';
+    adminContent.style.display = 'block';
+  }
+}
+
+function openPaymentModal() {
+  document.getElementById('payment-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Reset button state
+  const btn = document.getElementById('checkout-btn');
+  if (btn) { btn.disabled = false; btn.textContent = '💳 Betal med kort via Stripe →'; }
+}
+function closePaymentModal() { document.getElementById('payment-modal').classList.remove('open'); document.body.style.overflow = ''; }
+
+// ===== DATA =====
+const models = [
+  { name:"BMW 1-serie (E87)", series:"1-serie", year_range:"2004–2011", engine_options:"116i, 118i, 120i, 130i, 116d, 118d, 120d, 123d", description:"Kompakt bakhjulsdrevet BMW med ekte kjøreglede i liten innpakning. Populær blant unge entusiaster." },
+  { name:"BMW 2-serie (F22/F23)", series:"2-serie", year_range:"2014–2021", engine_options:"218i, 220i, 228i, 230i, M240i, 218d, 220d, 225d", description:"Sporty kupé og cabriolet med bakhjulsdrift. Etterfølgeren til 1-serie kupé." },
+  { name:"BMW 3-serie (E46)", series:"3-serie", year_range:"1998–2006", engine_options:"316i, 318i, 320i, 323i, 325i, 330i, 318d, 320d, 330d", description:"En av de mest populære BMW-modellene noensinne. Legendarisk kjøredynamikk og god tilgjengelighet på reservedeler." },
+  { name:"BMW 3-serie (E90/E91/E92)", series:"3-serie", year_range:"2005–2013", engine_options:"316i, 318i, 320i, 325i, 330i, 335i, 318d, 320d, 325d, 330d, 335d", description:"Moderne og teknologisk avansert 3-serie. 335i-motoren er en favoritt blant entusiaster." },
+  { name:"BMW 3-serie (F30/F31)", series:"3-serie", year_range:"2012–2019", engine_options:"316i, 318i, 320i, 328i, 330i, 340i, 316d, 318d, 320d, 330d", description:"Sjette generasjon 3-serie med moderne teknologi, iDrive og EfficientDynamics." },
+  { name:"BMW 4-serie (F32/F33)", series:"4-serie", year_range:"2013–2020", engine_options:"420i, 428i, 430i, 440i, 418d, 420d, 430d", description:"Sporty kupé og cabriolet basert på F30-plattformen. Mer dynamisk styling enn 3-serien." },
+  { name:"BMW 5-serie (E39)", series:"5-serie", year_range:"1995–2003", engine_options:"520i, 523i, 525i, 528i, 530i, 535i, 540i, 520d, 525d, 530d", description:"Regnes av mange som den ultimate 5-serien. Balansert kjøreegenskaper og elegant design." },
+  { name:"BMW 5-serie (E60/E61)", series:"5-serie", year_range:"2003–2010", engine_options:"520i, 523i, 525i, 530i, 535i, 550i, 520d, 525d, 530d, 535d", description:"Kontroversiell design, men teknisk avansert med V10 M5-motor tilgjengelig." },
+  { name:"BMW 5-serie (F10/F11)", series:"5-serie", year_range:"2010–2017", engine_options:"520i, 528i, 530i, 535i, 550i, 518d, 520d, 525d, 530d, 535d", description:"Moderne, elegant 5-serie med fremragende komfort og avansert teknologi." },
+  { name:"BMW 7-serie (E38)", series:"7-serie", year_range:"1994–2001", engine_options:"728i, 730i, 735i, 740i, 750i, 728d, 730d", description:"Luksuriøs limousine fra 90-tallet. Populær blant samlere for sin tidløse eleganse." },
+  { name:"BMW X3 (E83)", series:"X-serie", year_range:"2003–2010", engine_options:"2.0i, 2.5i, 3.0i, 2.0d, 3.0d", description:"Kompakt SUV med allhjulsdrift. Praktisk hverdagsbil med BMW-kjøreegenskaper." },
+  { name:"BMW X5 (E53)", series:"X-serie", year_range:"1999–2006", engine_options:"3.0i, 4.4i, 4.6is, 4.8is, 3.0d", description:"BMWs første SUV. Kombinerer kjøreglede med praktisk karosseri og allhjulsdrift." },
+  { name:"BMW X5 (E70)", series:"X-serie", year_range:"2006–2013", engine_options:"xDrive30i, xDrive35i, xDrive48i, xDrive30d, xDrive35d, xDrive40d", description:"Andre generasjon X5 med xDrive allhjulsdrift og moderne teknologi." },
+  { name:"BMW M3 (E46)", series:"M-serie", year_range:"2000–2006", engine_options:"S54 3.2L inline-6 343hk", description:"Legendarisk M3 med høytytende atmosfærisk rekkesekser. En ekte entusiastbil." },
+  { name:"BMW M5 (E60)", series:"M-serie", year_range:"2005–2010", engine_options:"S85 5.0L V10 507hk", description:"Verdens første V10 sedan. Rå og kompromissløs ytelsesmaskin med ikonisk V10-lyd." }
+];
+
+const diagrams = [
+  { title:"E46 Bremsesystem foran", bmw_models:"E46 (1998-2006)", category:"Bremser", source_url:"https://www.realoem.com/bmw/enUS/showparts?id=BF93-EUR-01-2002-E46-BMW-320i&diagId=34_0574", description:"Komplett eksplosjonsskisse av det fremre bremsesystemet på E46 med caliper, skive og klosser." },
+  { title:"E46 Motoroppheng og motorputer", bmw_models:"E46 (1998-2006)", category:"Motor", source_url:"https://www.realoem.com/bmw/enUS/showparts?id=BF93-EUR-01-2002-E46-BMW-320i&diagId=22_0374", description:"Eksplosjonsskisse av motoropphenget på E46 inkl. motorputer og festebolter." },
+  { title:"E90 Fjæring foran (MacPherson)", bmw_models:"E90/E91/E92 (2005-2013)", category:"Fjæring", source_url:"https://www.realoem.com/bmw/enUS/showparts?id=VA93-EUR-01-2007-E90-BMW-320i&diagId=31_0581", description:"Detaljert skisse av det fremre MacPherson fjæringssystemet på E90." },
+  { title:"E60 Automatgir ZF 6HP", bmw_models:"E60/E61 (2003-2010)", category:"Transmisjon", source_url:"https://www.realoem.com/bmw/enUS/showparts?id=NW51-EUR-01-2006-E60-BMW-530i&diagId=24_1185", description:"Teknisk tegning av ZF 6HP automatgirkasse brukt i E60 inkl. ventilblokk." },
+  { title:"E46 Avgassystem bakre lyddempere", bmw_models:"E46 (1998-2006)", category:"Avgassystem", source_url:"https://www.realoem.com/bmw/enUS/showparts?id=BF93-EUR-01-2002-E46-BMW-320i&diagId=18_1207", description:"Komplett avgassystem for E46 inkl. bakre lyddempere, mellomdempere og fester." },
+  { title:"E46 Kjølesystem og vannpumpe", bmw_models:"E46 (1998-2006)", category:"Kjøling", source_url:"https://www.realoem.com/bmw/enUS/showparts?id=BF93-EUR-01-2002-E46-BMW-320i&diagId=17_0118", description:"Kjølesystemet på E46 inkl. vannpumpe, termostat og kjølevæskebeholder." },
+  { title:"E90 Bremsesystem bak", bmw_models:"E90/E91/E92 (2005-2013)", category:"Bremser", source_url:"https://www.realoem.com/bmw/enUS/showparts?id=VA93-EUR-01-2007-E90-BMW-320i&diagId=34_1119", description:"Bakre bremsesystem på E90 inkl. caliper, skive og parkeringsbremse." },
+  { title:"E60 Bakre fjæring (multilink)", bmw_models:"E60/E61 (2003-2010)", category:"Fjæring", source_url:"https://www.realoem.com/bmw/enUS/showparts?id=NW51-EUR-01-2006-E60-BMW-530i&diagId=33_1131", description:"Bakre multilink fjæringssystem for E60/E61 med bærearm, trapesarm og støtdemper." }
+];
+
+let guides = [
+  { title:"Bytte bremseklosser foran", category:"Bremser", difficulty:"Enkel", bmw_models:"E46, E90, E60, E87", estimated_time:"1-2 timer", tools_needed:"Jekk, jekkstativ, hjulboltnøkkel, skrunøkkel sett, c-klemme", steps:"1. Løsne hjulboltene lett før jekking.\n2. Jekk opp bilen og sett på jekkstativ.\n3. Demonter hjulet.\n4. Skru løs bremsecaliperen (2 bolter bak).\n5. Heng calipen opp — ikke la den henge i bremseslangen.\n6. Ta ut de gamle klossene.\n7. Trykk bremsestempelet tilbake med c-klemme.\n8. Sett inn nye klosser.\n9. Monter calipen og hjulet.\n10. Pump bremsen 5-6 ganger før kjøring!", tips:"Sjekk alltid bremseskiven for slitasje samtidig. Bruk aldri fett på bremseflater. Kjør forsiktig de første 200 km.", premium:false },
+  { title:"Skifte motorolje og oljefilter", category:"Motor", difficulty:"Enkel", bmw_models:"E46, E90, E60, E87, E53", estimated_time:"30-60 min", tools_needed:"Oljedreiningsplugg nøkkel (17mm), oljefilterverktøy, oljepanne, jekk", steps:"1. Varm opp motoren i 2-3 min.\n2. Jekk opp bilen og fjern underkjølingsplaten.\n3. Plasser oljepanna under dreneringsplugg.\n4. Skru løs dreneringsplugg (17mm) og la oljen renne ut.\n5. Skift tetningsringen på pluggen.\n6. Fjern oljefilter med verktøy.\n7. Smør ny O-ring på filteret.\n8. Skru tilbake dreneringsplugg (25 Nm).\n9. Fyll på korrekt mengde olje ovenfra.\n10. Sjekk oljenivå med peilepinnen.", tips:"Bruk 5W-30 LL-04 for moderne BMW. Nullstill oljeserviceindikator etter bytte.", premium:false },
+  { title:"Bytte luftfilter", category:"Motor", difficulty:"Enkel", bmw_models:"E46, E90, E60, E87", estimated_time:"15-30 min", tools_needed:"Skrutrekker", steps:"1. Åpne panseret.\n2. Finn luftfilterkassen (høyre side av motoren).\n3. Løsne klemmer på luftfilterkassen.\n4. Ta ut det gamle filteret.\n5. Tørk av innsiden av kassen.\n6. Sett inn nytt filter med korrekt retning.\n7. Lukk kassen og fest klemmene.", tips:"Bytt hvert 30.000 km eller 2. år. Et rent filter kan gi 5-10% bedre ytelse.", premium:false },
+  { title:"Bytte støtdempere bak", category:"Fjæring", difficulty:"Middels", bmw_models:"E46, E90, E39", estimated_time:"2-4 timer", tools_needed:"Jekk, jekkstativ, skrunøkkel sett, fjærtvinge, momentnøkkel", steps:"1. Løsne hjulbolter og jekk opp bilen.\n2. Demonter hjulet.\n3. Skru løs støtdemperens nedre feste fra bærearm.\n4. Inne i bilen: fjern plasttrekk og skru løs øvre feste.\n5. Trekk ut støtdemperen nedenfra.\n6. Monter ny støtdemper i omvendt rekkefølge.\n7. Stram øvre mutter til 25 Nm, nedre bolt til 65 Nm.", tips:"Bytt alltid i par! Sjekk fjærer, støtdemperhoder og gummibøssinger samtidig.", premium:true },
+  { title:"Bytte termostat og kjølevæske", category:"Kjøling", difficulty:"Middels", bmw_models:"E46, E90, E39, E60", estimated_time:"2-3 timer", tools_needed:"Skrunøkkel sett, slangeklemme-tang, beholder for kjølevæske, frostveske", steps:"1. La motoren kjøle seg helt ned.\n2. Plasser beholder under radiatorens bunntapping.\n3. Åpne tappeskruen og la kjølevæsken renne ut.\n4. Finn termostathuset (følg øvre kjølevæskeslangen).\n5. Løsne slangen og demonter termostathuset.\n6. Bytt termostat og pakning/o-ring.\n7. Monter termostathuset og fest slangen.\n8. Fyll på ny kjølevæske (50/50 blanding).\n9. Start motor og la varme til driftstemperatur.\n10. Luft ut systemet ved å åpne lufteskruen.", tips:"Bruk alltid BMW-godkjent frostveske. Bytt aldri termostat på varm motor!", premium:true },
+  { title:"Bytte tennplugger", category:"Motor", difficulty:"Enkel", bmw_models:"E46, E87, E90, E60", estimated_time:"30-90 min", tools_needed:"Tennplugg-nøkkel, forlenger, skrunøkkel", steps:"1. La motoren kjøle seg ned.\n2. Fjern motorkappe.\n3. Koble løs direktetennere.\n4. Skru løs tennpluggene.\n5. Sjekk gap på nye plugger (0.8-1.0mm).\n6. Sett inn nye plugger for hånd.\n7. Stram til 20-25 Nm.\n8. Koble til tennere og test.", tips:"Bytt alltid alle tennplugger samtidig. Bruk NGK eller Bosch originalplugg.", premium:false },
+  { title:"Bytte kuleledd fremre bærearm", category:"Fjæring", difficulty:"Avansert", bmw_models:"E46, E90, E39", estimated_time:"3-5 timer", tools_needed:"Jekk, jekkstativ, kuleledd-presser/splitter, momentnøkkel, nye selvlåsende muttere", steps:"1. Jekk opp bilen og sett jekkstativ.\n2. Demonter hjulet.\n3. Skru løs stabilisatorstag fra bærearmen.\n4. Skru løs kuleled fra nav/dreietapp.\n5. Bruk kuleledd-splitter til å løsne.\n6. Demonter hele bærearmen.\n7. Erstatt kuleled eller hel bærearm.\n8. Monter i omvendt rekkefølge med NYE selvlåsende muttere.\n9. Stram til spec-moment.\n10. Bestill hjuljustering!", tips:"Alltid nye selvlåsende muttere — aldri gjenbruk! Alltid hjuljustering etter jobb.", premium:true },
+  { title:"Bytte bremseskiver og klosser bak", category:"Bremser", difficulty:"Middels", bmw_models:"E46, E90, E60, E39", estimated_time:"2-3 timer", tools_needed:"Jekk, jekkstativ, hjulboltnøkkel, stempelverktøy (skrutype for bak), momentnøkkel", steps:"1. Løsne hjulbolter og jekk opp bilen.\n2. Demonter hjul.\n3. Skru løs caliper og heng opp.\n4. Fjern caliper-bracket.\n5. Demonter bremseskiven.\n6. Sett på ny skive.\n7. Bytt klosser — HUSK: bakre stempel skrues inn, ikke trykkes!\n8. Monter bracket og caliper.\n9. Pump bremse.", tips:"Bakre bremsestempler skrues inn med klokken på BMW. Å trykke dem vil ødelegge calipen!", premium:true },
+  { title:"Resette service-indikator (CBS)", category:"Motor", difficulty:"Enkel", bmw_models:"E46, E90, E60, E87, E39, F30", estimated_time:"5 min", tools_needed:"Ingenting — gjøres fra dashbord", steps:"E46:\n1. Nøkkel i posisjon 1 (ikke start).\n2. Hold inn odometer-reset-knappen.\n3. Slipp — en tjeneste vises.\n4. Hold inn igjen 5 sek til det blinker.\n5. Slipp og trykk raskt for å bekrefte.\n\nE90/E60 (iDrive):\n1. Start bilen.\n2. iDrive → Bil → Servicemeldinger.\n3. Velg service → Reset → Bekreft.", tips:"Nullstill alltid service-indikatoren etter oljeskift!", premium:false },
+  { title:"Bytte pollenfilter / kupefilter", category:"Elektrisk", difficulty:"Enkel", bmw_models:"E46, E90, E60, E87, E39, F30", estimated_time:"10-20 min", tools_needed:"Ingenting til de fleste modeller", steps:"E46:\n1. Åpne hanskerommet.\n2. Trykk inn sidene og la det henge ned.\n3. Fjern filterkassen og ta ut gammelt filter.\n4. Sett inn nytt filter (pil viser luftretning).\n\nE90:\n1. Åpne hanskerommet.\n2. Fjern to klips på filterdekslet.\n3. Bytt filter.\n4. Lukk dekslet.", tips:"Bytt hvert år eller 15.000 km. Aktivt kullfilter anbefales for allergikere.", premium:false },
+  { title:"OBD2-diagnose av elfeil", category:"Elektrikk", difficulty:"Enkel", bmw_models:"Alle modeller", estimated_time:"30-60 min", tools_needed:"OBD2-scanner (INPA, ISTA eller ELM327), laptop eller mobil", steps:"1. Koble OBD2 til diagnostikkporten under rattet.\n2. Start bilen og apne diagnoseprogrammet.\n3. Les ut feilkoder fra alle styreenheter.\n4. Noter alle feilkoder.\n5. Sok opp kodene pa bimmerpost.com.\n6. Utfor malinger basert pa feilkodene.\n7. Rett feilen og slett kodene.\n8. Kjor testtur og sjekk om kodene kommer tilbake.", tips:"BMW-verktoy som INPA/ISTA gir mye mer info enn generiske scannere. Carly for BMW via Bluetooth ELM327 anbefales.", premium:false },
+  { title:"Bytte batteri og BMS-koding", category:"Elektrikk", difficulty:"Middels", bmw_models:"E46, E60, E90, F10, F30, G30", estimated_time:"1-2 timer", tools_needed:"Nytt batteri (AGM anbefalt), skrunokkelsett, OBD2 med BMW-koding", steps:"1. Sla av bilen og vent 5 minutter.\n2. Koble fra minuspolen forst, deretter pluspolen.\n3. Monter nytt batteri - pluss forst, sa minus.\n4. Apne BMW-kodingsverktoy og ga til Battery Registration.\n5. Angi kapasitet og type (AGM/EFB).\n6. Bekreft - IBS-sensoren nullstilles.\n7. Start bilen og sjekk ladespanning (ca 14V).", tips:"Pa BMW E-serie MA batteriet registreres digitalt - ellers lades det feil og levetiden halveres!", premium:false },
+  { title:"Bilen starter ikke - feilsok batteri og starter", category:"Elektrikk", difficulty:"Enkel", bmw_models:"Alle modeller", estimated_time:"30-45 min", tools_needed:"Multimeter, jumperkabler eller starterbooster", steps:"1. Mal batterispenning: Over 12.4V er OK, under 12V er ladet ut.\n2. Prov a starte.\n3. Prov jumpstart. Starter bilen? Batteri er problemet.\n4. Starter ikke med jumpstart - sjekk sikringene.\n5. Mal spenning pa starterens pluspol under forsok. Under 10V er kabelproblemer.\n6. Sjekk jordforbindelser - rens kontaktpunkter pa motor og karosseri.\n7. Starter ikke snurrer tross alt: Bytt starterrele eller starter.", tips:"BMW E46 og E90 er kjent for darlige jordforbindelser under batteribraketten. Rens disse alltid!", premium:false },
+  { title:"Bytte tenningsspoler og tennplugger N52/N54/N55", category:"Elektrikk", difficulty:"Enkel", bmw_models:"E90 320i/328i, F30 320i/328i, E60 525i/530i", estimated_time:"45-90 min", tools_needed:"Tennplugnokkel, ratsjsett, momentnokkel, nye tennplugger og spoler", steps:"1. La motoren kjole seg ned.\n2. Fjern motordekselet.\n3. Koble fra elektrisk kontakt pa tenningsspole.\n4. Skru ut spolen (8mm bolt).\n5. Trekk ut spolen og tennpluggen.\n6. Sjekk elektrodeslitasje.\n7. Sett inn ny tennplugg og trekk til 25 Nm.\n8. Sett inn ny spole og koble til.\n9. Gjenta for alle sylindre.\n10. Start og sjekk for risting eller feilkoder.", tips:"Bytt ALLTID alle spoler og plugger samtidig. Symptomer: risting ved kaldstart, P030x-koder. NGK og Bosch anbefales.", premium:false },
+  { title:"FRM-modul feil - vindu og sentrallas", category:"Elektrikk", difficulty:"Middels", bmw_models:"E90, E91, E92, E87, E60", estimated_time:"1-2 timer", tools_needed:"OBD2-scanner, multimeter, skrunokkelsett", steps:"1. Les feilkoder fra FRM-modulen med OBD2.\n2. Symptomer: vinduer virker ikke, blinklys henger, sentrallas oppforer seg rart - alt pa en gang.\n3. Sjekk sikringer for vindusheiser og sentrallas.\n4. Test vindusmotoren direkte med 12V.\n5. FRM sitter i A-stolpen pa E90 - kjent for kalde loddepunkter.\n6. Sjekk gummigjennomforingen mellom dor og karosseri.\n7. FRM kan loddes av elektronikkspesialist for 500-1500 kr.", tips:"BMW E90 FRM-problemer er ekstremt vanlige! Elektronikkspesialist kan reparere den for en brokdel av BMW-pris.", premium:false },
+  { title:"Bytte alternator (dynamo)", category:"Elektrikk", difficulty:"Avansert", bmw_models:"E46, E90, E60, E87", estimated_time:"2-4 timer", tools_needed:"Skrunokkelsett, ratsjsett, serpentinbeltetrekker, multimeter", steps:"1. Koble fra batteriet (minus forst).\n2. Losne serpentinbeltet og ta det av.\n3. Koble fra elektrisk kontakt og batterikabel pa alternator.\n4. Skru los monteringsboltene.\n5. Ta ut alternator.\n6. Monter ny og trekk til bolter.\n7. Legg pa beltet og koble til batteri.\n8. Start bilen og mal ladespenning: 13.8-14.8V er OK.", tips:"Sjekk serpentinbelte og ruller samtidig - billige deler! Symptomer: batteri-lys, svingende lysstyrke, bil dor under kjoring.", premium:true },
+  { title:"CAS-modul og startproblemer E-serie", category:"Elektrikk", difficulty:"Avansert", bmw_models:"E60, E90, E87, E65, E70", estimated_time:"1-3 timer", tools_needed:"INPA eller ISTA, OBD2-kabel, multimeter", steps:"1. Koble INPA/ISTA og les feilkoder fra CAS-modulen.\n2. Vanlige feil: Key not recognized, EWS tampering, startsperre aktiv.\n3. Sjekk batterispenning til CAS - trenger stabil 12V.\n4. Bytt CR2032-batteri i nokkelen.\n5. Prov reservenokkelen - er den defekt?\n6. Sjekk CAN-busforbindelsen mellom CAS og DME.\n7. Sjekk loddepunkter pa CAS-kortet.\n8. Siste utvei: CAS ma byttes av spesialist.", tips:"CAS-problemer pa E60 skyldes ofte kalde loddepunkter. Elektronikkreparatar kan fikse dette billig.", premium:true },
+  { title:"ABS-pumpe og DSC-modul diagnose", category:"Elektrikk", difficulty:"Avansert", bmw_models:"E46, E90, E60, F10, F30", estimated_time:"2-4 timer", tools_needed:"OBD2-scanner med ABS/DSC-lesing, skrunokkelsett", steps:"1. Les feilkoder fra ABS/DSC-modulen.\n2. Vanlige koder: 5E12 (hjulsensor), 5E50 (pumpe).\n3. Sjekk hjulsensorene med multimeter - motstand 800-1500 ohm.\n4. Sjekk ledningene til hjulsensorer for brudd.\n5. Sjekk ABS-pumpens rele og sikring.\n6. Demonter pumpen, monter ny og koble til.\n7. Fyll bremsevaeske og luft systemet.\n8. Slett feilkoder og test ABS ved lav fart.", tips:"ABS-lys og DSC-lys samtidig er oftest hjulsensor. Sjekk rotorringen for rust - mye billigere enn pumpen!", premium:true },
+  { title:"Bytte VANOS-pakninger N42/N46", category:"Motor", difficulty:"Avansert", bmw_models:"E46 318i/320i, E87 118i/120i", estimated_time:"3-5 timer", tools_needed:"VANOS-verktoy, momentnokkel, pakningsmasse, ratsjsett", steps:"1. Ta av ventildekselet.\n2. Still inn motor pa OT (overdodpunkt).\n3. Las inn kammer- og krumstokkaksel med laselapper.\n4. Skru ut VANOS-enheten (ikke roter motoren!).\n5. Bytt alle O-ringer og pakninger.\n6. Monter VANOS og trekk til momentbolter (10 Nm).\n7. Sett pa ventildekselet.\n8. Start og sjekk for tikke-lyder og feilkoder.", tips:"Tikke-lyd ved kaldstart og treig gasrespons er klassiske VANOS-symptomer pa N42/N46. Bytt begge sider samtidig.", premium:true },
+  { title:"Bytte kjolevifte og viftekobling", category:"Kjøling", difficulty:"Middels", bmw_models:"E46, E39, E60 med bensinmotor", estimated_time:"1-2 timer", tools_needed:"Viftekoblingsnokkel (venstregjenget!), ratsjsett, ny viftekobling", steps:"1. La motoren kjole seg ned helt.\n2. Fjern eventuell luftinntak og kjolerhus.\n3. Hold viftebladet og skru av viftekoblingen - VENSTREGJENGET, altsa med klokka.\n4. Ta av viften.\n5. Monter ny viftekobling - trekk til godt.\n6. Sett tilbake luftinntak og kjolerhus.\n7. Start og test - viften skal stramme seg opp ved hoye temperaturer.", tips:"Venstregjenget er en klassiker folk glemmer - skru MED klokka for a lose den. Symptomer: overoppheting i stillestand, lav viftestoy.", premium:false },
+  { title:"Bytte handbrekkwire og justering", category:"Bremser", difficulty:"Middels", bmw_models:"E46, E90, E60, E87", estimated_time:"1-2 timer", tools_needed:"Skrunokkelsett, universalsett, ny handbrekkwire", steps:"1. Loft bilen og sikre med bukker.\n2. Fjern midtkonsoll for tilgang til handbrekkjustering.\n3. Slakk ut wirejusteringen ved konsollen.\n4. Koble fra wireen ved begge bakhjul (clip og gaffelpin).\n5. Trekk ut gammel wire.\n6. Tre inn ny wire og koble til.\n7. Juster sa handbrekket strammer pa ca 4-6 klikk.\n8. Test begge bakhjul - skal lase seg likt.", tips:"BMW E46 handbrekkwire rakner ofte ved de bakre klemfestene. Sjekk alltid disse forst - billig fix!", premium:false },
+  { title:"Bytte styrestag og styreled", category:"Fjæring", difficulty:"Middels", bmw_models:"E46, E90, E60, E87, E39", estimated_time:"1-2 timer", tools_needed:"Kulleddholder, ratsjsett, momentnokkel, innstillingsnokkel", steps:"1. Loft bilen og ta av hjulet.\n2. Mal lengden pa eksisterende styrestag forst!\n3. Skru av kringlemutre pa begge ender.\n4. Hold styrestaget fast og skru ut styreledet.\n5. Monter nytt styreled pa samme lengde.\n6. Sett tilbake og trekk til momentbolter.\n7. Monter hjul.\n8. Kjor til hjulstilling umiddelbart etter - dette er pakrevd!", tips:"Mal alltid styrestaglengden for demontering - da slipper du grove hjulstillingsfeil. Kjor alltid til stilling etter dette arbeidet.", premium:false },
+  { title:"Bytte vindusheis (vindusmotor)", category:"Elektrikk", difficulty:"Middels", bmw_models:"E46, E90, E60, E87", estimated_time:"1-2 timer", tools_needed:"Torx-sett, flatskrutrekker, ny vindusheis eller motor", steps:"1. Ta av dorpanelet - start med armlenestolpen (T20/T25 Torx).\n2. Koble fra vindusknapp-kontakten.\n3. Fjern plastfolie forsiktig (limes tilbake).\n4. Koble fra elektrisk kontakt pa vindusmotoren.\n5. Skru ut tre Torx-bolter pa motorenheten.\n6. Skyv vinduet opp og lim det fast midlertidig.\n7. Ta ut heiserammen og monter ny.\n8. Test vindus opp/ned for du lukker dorpanelet.", tips:"BMW E46 er kjent for sprukne plastskinner pa heisenmekanismen - da kan du bytte bare skinnen (ca 150 kr) istedenfor hele heisen!", premium:false },
+  { title:"Skifte giroljе ZF 6HP automatgir", category:"Transmisjon", difficulty:"Avansert", bmw_models:"E60 525i/530i/535i, E65, X5 E53/E70", estimated_time:"2-3 timer", tools_needed:"Torx T40/T45, ny olje (Castrol TQ95 eller Shell M-1375.4), oljetilsetningssett", steps:"1. Kjor bilen varm (60-80 grader girboks).\n2. Loft bilen og plasser oljeoppsamler.\n3. Skru ut toplugg (T40) og slipp ut gammel olje.\n4. Bytt topplugg-pakning.\n5. Fyll olje via pafyllingsplugg til olje renner ut av niva-hullet.\n6. Sett inn niva-plugg forst, deretter toplugg.\n7. Start bilen og kjor gjennom alle gir.\n8. Sjekk for lekkasje.", tips:"Bruk KUN godkjent olje til ZF 6HP - feil olje odelegger klosser i lop av maner. Bytt hvert 60.000 km.", premium:true },
+  { title:"Bytte ekspansjonstank kjoleanlegg", category:"Kjøling", difficulty:"Enkel", bmw_models:"E46, E90, E60, E87, E39", estimated_time:"30-60 min", tools_needed:"Skrunokkelsett, ny ekspansjonstank, ny kjolevaeskemengde", steps:"1. La motoren kjole seg helt ned.\n2. Skru av lokket pa ekspansjonstanken.\n3. Klem av den nedre slangen og la kjolevaeske renne ut i kanne.\n4. Koble fra alle slanger fra tanken (2-3 stk).\n5. Skru ut festeboltene og ta ut gammel tank.\n6. Monter ny tank og koble til slanger.\n7. Fyll kjolevaske til MAX og skru pa lokket.\n8. Start bilen og sjekk for bobler - lufting kan vaere nodvendig.", tips:"BMW-plast ekspansjonstanker sprekker gjerne etter 10 ar. Symptom: mysterios kjolevaesketap. Bytt forebyggende!", premium:false },
+  { title:"Diagnostisere og bytte lambdasonde", category:"Motor", difficulty:"Middels", bmw_models:"E46, E90, E60, E87, E39", estimated_time:"1-2 timer", tools_needed:"OBD2-scanner, lambdasondenokkel, ny lambdasonde", steps:"1. Les feilkoder - P0130, P0136, P0140, P0300 peker pa lambdasonde.\n2. Finn lambdasonden - sitter pa avgassroret foran og/eller bak katalysatoren.\n3. Varm opp motoren - da er bolten lettere a lose.\n4. Spray penetreringsolje pa lambdasondebolten.\n5. Bruk lambdasondenokkel og skru ut.\n6. Skru inn ny sonde - trekk til 40-50 Nm.\n7. Koble til kontakten.\n8. Slett feilkoder og kjoer en tur.", tips:"Varm motor gjor lambdasondebolten lettere a skru ut. Aldri bruk vanlig skruenokkel - da skader du kablene!", premium:false },
+  { title:"Bytte AC-kompressor og tore systemet", category:"Annet", difficulty:"Avansert", bmw_models:"E46, E90, E60, E87", estimated_time:"3-5 timer", tools_needed:"AC-verktoy for evakuering og fylling, ratsjsett, ny kompressor", steps:"1. Evakuer AC-systemet med riktig verktoy (MAST gjores av fagperson).\n2. Koble fra ledningene til kompressoren.\n3. Losne serpentinbeltet.\n4. Skru ut kompressorens monteringsbolter.\n5. Ta ut gammel kompressor.\n6. Monter ny - trekk til momentbolter.\n7. Bytt AC-filter/tork-filter samtidig.\n8. Evakuer og fyll nytt kjolemiddel (R134a eller R1234yf).", tips:"Bytt alltid AC-filter nar du apner systemet - fukt odelegger kompressoren. AC-fyll MÅ gjores av sertifisert verksted.", premium:true },
+  { title:"Bytte stabstag og stabilisatorkobling", category:"Fjæring", difficulty:"Enkel", bmw_models:"E46, E90, E60, E87, F30", estimated_time:"30-60 min", tools_needed:"17mm og 18mm skruenokkel, Torx T40, ny stabilisatorkobling", steps:"1. Loft bilen og ta av hjulet.\n2. Hold Torx-hodet pa koblingstappen fast.\n3. Skru av mutteren med 17mm nokkel.\n4. Trekk ut koblingsstaket.\n5. Sett inn ny og trekk til 50 Nm.\n6. Monter hjul og sett ned bilen.\n7. Test ved a kjore over speed-humper.", tips:"Knitrelyd og banking over humper er klassisk stabstag-symptom pa BMW. En av de billigste og enkleste fjaeringsfixene!", premium:false },
+  { title:"Bytte belysning - xenon og LED-paerer", category:"Elektrikk", difficulty:"Middels", bmw_models:"E46, E90, E60, E87, F30", estimated_time:"30-90 min", tools_needed:"Nye paerer, ev. xenon-startpakke, hansker (ikke ta pa xenon-paerer!)", steps:"1. Apne panser og finn lyktebakside.\n2. Vri av paereholderen (90 grader mot klokka).\n3. Dra ut gammel paere.\n4. XENON: Koble fra HV-kontakten forst! Vent 30 sek. Bytt kun med hansker.\n5. Monter ny paere - ikke ta pa glasset!\n6. Vri tilbake holderen.\n7. Test alle lys forste gang i morket.", tips:"Xenon-paerer inneholder 25.000 volt - aldri rore uten a koble fra! Nyere BMW har sett med ISTA-koding for nye lyktemoduler.", premium:false },
+  { title:"Bytte kilerem og spennrulle", category:"Motor", difficulty:"Middels", bmw_models:"E46, E90, E60, E87, E39", estimated_time:"1-2 timer", tools_needed:"Serpentinbeltenokkel eller brekkjern, ny kilerem, ny spennrulle", steps:"1. Finn belteruting-diagrammet (sitter ofte pa motorpanser).\n2. Bruk 15-16mm nokkel pa spenneren og trykk inn.\n3. Dra av beltet.\n4. Skru ut spennrullen og bytt.\n5. Tre pa nytt belte ifolge rutingdiagrammet.\n6. Sett spenner tilbake og slipp langsomt.\n7. Start og sjekk at beltet gar rett.", tips:"Kilerem bor byttes hvert 60.000 km eller 4 ar. Bytt alltid spennrulle og eventuelt lopehjul samtidig - billig forebygging!", premium:false },
+  { title:"Bytte turbo N47/N57 diesel", category:"Motor", difficulty:"Avansert", bmw_models:"E90 318d/320d, E60 520d/525d, F30 318d/320d", estimated_time:"4-6 timer", tools_needed:"Ratsjsett, momentnokkel, nye pakninger, ny turbo", steps:"1. Kople fra batteriet og la motoren kjole.\n2. Fjern luftinntaket og mellomkjoleren.\n3. Koble fra olje- og kjolevannslanger fra turbo.\n4. Fjern varmeskjoldet og skru ut avgassflensen (4 bolter).\n5. Skru ut turboens inntaksflens mot innsugingen.\n6. Ta ut turbo.\n7. Monter ny turbo med nye pakninger.\n8. Fyll olje i turbo-oljeinntaket forst start!\n9. Start og la ralenti i 5 min - sjekk for lekkasje.", tips:"VIKTIG: Fyll alltid olje i turboens oljeinntaksrort for forste start - ellers brenner lagrene ut umiddelbart!", premium:true },
+  { title:"Bytte svalehalspakning (toppakning)", category:"Motor", difficulty:"Avansert", bmw_models:"E46, E90, E60 - alle bensinmodeller", estimated_time:"6-10 timer", tools_needed:"Momentnokkel, sylinderhodebolter (engangsbruk), ny toppakning, kjolevaeske", steps:"1. Tapte kjolevaesken og ta av alle toppdeler (inntak, avgass, tennplugger).\n2. Fjern kamakselene og las dem med monteringsskinne.\n3. Skru ut sylinderhodeboltene - alltid pa tvers (ikke sirkel).\n4. Loft av sylinderhodet.\n5. Rens alle flater grundig.\n6. Legg ny pakning.\n7. Trekk til nye sylinderhodeboltene i tre omganger ifolge momenttabell.\n8. Monter alt og fyll kjolevaeske.\n9. Kjor til temperatur og sjekk for lekkasje.", tips:"Toppakning bor ALDRI repareres med tetningsvaeske - bytt alltid ekte BMW-pakning. Bruk alltid nye sylinderhodeboltene!", premium:true },
+  { title:"Bytte bremsevaeske (DOT4 service)", category:"Bremser", difficulty:"Enkel", bmw_models:"Alle modeller", estimated_time:"30-45 min", tools_needed:"Ny DOT4 bremsvaeske, luftingssett eller sproyteflaske, 8mm nokkel", steps:"1. Fyll nytt DOT4 i beholderen pa toppen.\n2. Start bakerst venstre hjul - det lengste fra hovesylinder.\n3. Sett luftingsslange pa luftingsskruen.\n4. Skru opp luftingsskruen 3/4 runde.\n5. Trykk bremsepedalen sakte ned til bunn, hold.\n6. Stram luftingsskruen, slipp pedalen.\n7. Gjenta til klar vaeske kommer ut - ingen bobler.\n8. Gjenta pa alle 4 hjul i rekkefolgе: BV, BH, FV, FH.", tips:"Bremsvaeske bor byttes hvert 2. ar - den suger til seg fukt og senker kokepunktet. DOT4 er standard for alle BMW.", premium:false },
+  { title:"Feilsok og bytte injektorer M57 diesel", category:"Motor", difficulty:"Avansert", bmw_models:"E46 330d, E60 530d, E90 330d, X5 3.0d", estimated_time:"3-5 timer", tools_needed:"INPA/ISTA diagnoseverktoy, injektortrekkverktoy, momentnokkel, nye injektorer", steps:"1. Les feilkoder med INPA - P0200-P0208 peker pa spesifikk injektor.\n2. Utfor injektorkorreksjonsverdier (IMA) i INPA for a identifisere svakeste.\n3. Fjern motorpanset og innsugingsmanifold.\n4. Koble fra injektorkabelen.\n5. Skru ut klembolten pa injektoren.\n6. Bruk trekkverktoy for a dra ut injektoren.\n7. Bytt kobberring og monter ny injektor.\n8. Kode inn nye injektors IMA-verdier i INPA.", tips:"BMW M57 injektorer er kjent for a bli sittende fast - bruk ALLTID trekkverktoy, aldri stang eller skrutrekker!", premium:true },
+  { title:"Bytte fremre og bakre motorputer", category:"Motor", difficulty:"Middels", bmw_models:"E46, E90, E60, E87", estimated_time:"2-3 timer", tools_needed:"Jekk, bukker, ratsjsett, ny motorpute", steps:"1. Loft motoren lett med en jekk under oljesumpen (legg tre mellom).\n2. Skru ut mutteren pa toppen av motorputa.\n3. Loft motoren 2-3 cm.\n4. Skru ut de nedre boltene til motorputens brakett fra karosseri.\n5. Ta ut gammel pute.\n6. Sett inn ny pute og monter brakett.\n7. Senk motoren og trekk til toppmutter.\n8. Sjekk for sprekker pa gjenvaerende puter.", tips:"Symptomer pa darlig motorpute: risting ved tomgang, banking ved gassgiving, vibrasjon i ratt. Billig fix for stor forskjell!", premium:false },
+  { title:"Rengjore og bytte EGR-ventil diesel", category:"Motor", difficulty:"Middels", bmw_models:"E46 320d, E90 318d/320d, E60 520d/525d", estimated_time:"1-3 timer", tools_needed:"Torx-sett, karbrengjorer (spray), ny pakning, ratsjsett", steps:"1. La motoren kjole.\n2. Finn EGR-ventilen - sitter mellom avgassmanifold og innsuging.\n3. Koble fra elektrisk kontakt.\n4. Skru ut festeboltene (3-4 stk).\n5. Ta ut EGR og inspekter - typisk full av sort sot.\n6. Spray med karbrengjorer og la virke 30 min.\n7. Rens med kost og trykkloft.\n8. Monter med ny pakning og trekk til.", tips:"Tett EGR gir svart rok, hoyt tomgangstall og dArlig akselerasjon. Rengjoring kan spare deg for dyr utskifting!", premium:false },
+  { title:"Bytte fremre fjaeringsbein komplett", category:"Fjæring", difficulty:"Avansert", bmw_models:"E46, E90, E87, F30", estimated_time:"2-3 timer", tools_needed:"Fjaerspanner, momentnokkel, ratsjsett, ny fjaeringsbein eller deler", steps:"1. Loft bilen og ta av hjulet.\n2. Koble fra bremseslange og ABS-kabel fra fjaeringsbenet.\n3. Skru ut de to nedre boltene til fjaeringsbenet i hjulstupen.\n4. Skru ut de tre ovre mutterne inne i panserrommet.\n5. Dra ut fjaeringsbenet.\n6. Monter fjaerspanner og demonter topplager, fjear og demper.\n7. Bytt nodvendige deler og sett saman igjen.\n8. Monter og trekk til alle bolter ifolge momenttabell.", tips:"Bytt alltid topplager (strotlager) nar du likevel har benet ute - det koster lite og sparer deg for dobbeltarbeid!", premium:true },
+  { title:"Bytte rustne bremseror", category:"Bremser", difficulty:"Avansert", bmw_models:"E46, E39, E60 - spesielt norske biler", estimated_time:"3-6 timer", tools_needed:"Rorskjerer, flaringsverktoy, nye rorledninger, rorskrunokkler", steps:"1. Tapte bremsevaeske.\n2. Finn rustne ror - typisk under bilen langs karossen.\n3. Klem av gummislanger i naerheten.\n4. Skru forsiktig los rorskruene - bruk rorskruenokkel!\n5. Klipp ut det rustne stykket.\n6. Ma opp og lag nytt ror med flaringsverktoy.\n7. Monter og trekk til skruene.\n8. Fyll og luft hele bremseanlaeget.", tips:"Rust pa bremseror er en stor sikkerhetsrisiko og EU-kontroll-kjenner. BMW E46 er spesielt utsatt i det norske klimaet!", premium:true },
+  { title:"Bytte termostat og temperaturfoler", category:"Kjøling", difficulty:"Middels", bmw_models:"E46, E90, E60, E87", estimated_time:"1-2 timer", tools_needed:"Skrunokkelsett, ny termostat med pakning, kjolevaeskebeholder", steps:"1. La motoren kjole helt ned.\n2. Klem av den nedre kjolerslangen og la kjolevaesken renne ut.\n3. Finn termostathuset - typisk pa venstre side av motoren.\n4. Skru ut festeboltene pa termostathuset.\n5. Ta ut gammel termostat.\n6. Rens flaten og monter ny termostat med pakning.\n7. Fyll kjolevaske og luft systemet.\n8. Start og kjor til temperatur - sjekk at viften slAr seg pa.", tips:"Defekt termostat gir enten overoppheting (sitter lukket) eller for kald motor (sitter apen). Bytt alltid pakning samtidig.", premium:false },
+  { title:"Bytte kupefilter og desinfisere AC", category:"Annet", difficulty:"Enkel", bmw_models:"Alle modeller", estimated_time:"20-40 min", tools_needed:"Nytt kupefilter, AC-desinfeksjon spray", steps:"1. Finn kupefilteret - vanligvis bak hanskerommet.\n2. Apne hanskerommet og trykk inn sideklipsene sa det vipper ned.\n3. Trekk ut det gamle filteret.\n4. Sett inn nytt filter - merk retningspilet!\n5. Klikk hanskerommet tilbake.\n6. Spray AC-desinfeksjon inn i luftinnsuget utvendig (foran frontruten).\n7. Kjor AC pa full i 10 min med resirkulering av.\n8. Luft ut bilen etterpA.", tips:"Muggen lukt fra AC betyr bakterievekst i fordamperen. AC-desinfeksjon-spray fra butikk er billig og effektivt!", premium:false },
+  { title:"Bytte drivaksel og mansjett", category:"Fjæring", difficulty:"Avansert", bmw_models:"E46, E90, E87, E60 (forhjulsdrift-variant)", estimated_time:"2-4 timer", tools_needed:"Drivakseltrekker, momentnokkel, ny drivaksel eller mansjett, ny kronmutter", steps:"1. Loft bilen og ta av hjulet.\n2. Skru ut kronmutteren pa navlager (ny trengs etter demontering).\n3. Koble fra fremre baerebjelken.\n4. Dra nav-enheten utover og ut av drivakselen.\n5. Drei drivakselen ut av girkassen.\n6. Monter ny drivaksel - smor splinesen.\n7. Trekk til kronmutter til 220 Nm og brikk over.\n8. Monter baerebjelke og hjul.", tips:"Klikkelyd i sving = slitt ytterste CV-ledd. Kan repareres med ny mansjett og fett hvis oppdaget tidlig nok!", premium:true },
+  { title:"Bytte oljepakning ventildeksel", category:"Motor", difficulty:"Enkel", bmw_models:"E46, E90, E60, E87, E39", estimated_time:"30-60 min", tools_needed:"Torx-sett, ny ventildekselpakning, pakningsmasse", steps:"1. La motoren kjole.\n2. Koble fra tennpluggedekslene og ta av luftinntak.\n3. Skru ut alle ventildekselboltene (Torx T30 - typisk 10-15 stk).\n4. Loft av ventildekselet forsiktig.\n5. Rens alte flater for gammel pakning.\n6. Legg ny pakning i sporet.\n7. Monter ventildekselet og trekk til boltene pa tvers (ikke sirkel).\n8. Start og sjekk for lekkasje ved tennpluggbronnene.", tips:"Olje i tennpluggbronnene gir tenningssvikt og risting - ofte er det bare ventildekselpakningen som lekker! Billig fix.", premium:false }
+];
+
+const parts = [
+  { name:"BMW Parts Norway", url:"https://www.bmwparts.no", country:"🇳🇴 Norge", description:"Norsk nettbutikk for originale og ettermarkeds BMW-deler.", category:"OEM deler" },
+  { name:"Autodoc", url:"https://www.autodoc.no", country:"🇳🇴 Norge", description:"Stor europeisk nettbutikk med bredt utvalg til gode priser.", category:"Ettermarked" },
+  { name:"RealOEM", url:"https://www.realoem.com", country:"🌐 Internasjonal", description:"Offisiell BMW OEM delekatalog med eksplosjonsskisser og delenummer.", category:"OEM deler" },
+  { name:"bmwfans.info", url:"https://www.bmwfans.info", country:"🌐 Internasjonal", description:"Teknisk informasjon om BMW-modeller, spesifikasjoner og deler.", category:"OEM deler" },
+  { name:"Finn.no – BMW deler", url:"https://www.finn.no/bap/forsale/search?q=BMW+deler", country:"🇳🇴 Norge", description:"Finn brukte BMW-deler fra private selgere i Norge.", category:"Bruktdeler" },
+  { name:"FCP Euro", url:"https://www.fcpeuro.com/bmw", country:"🌐 USA/Int'l", description:"Kvalitetsdeler med livstidsgaranti. Stor utvalg OEM og ettermarkeds.", category:"Ettermarked" },
+  { name:"Turner Motorsport", url:"https://www.turnermotorsport.com", country:"🌐 USA/Int'l", description:"Spesialist på BMW ytelsesdeler og modifikasjoner.", category:"Tilbehør" },
+  { name:"Bilxtra", url:"https://www.bilxtra.no", country:"🇳🇴 Norge", description:"Norsk bildelskjede med BMW-deler og -tilbehør.", category:"Ettermarked" },
+  { name:"eBay Motors – BMW", url:"https://www.ebay.com/b/BMW-Car-Truck-Parts-Accessories/6030/bn_580291", country:"🌐 Internasjonal", description:"Stort utvalg nye og brukte BMW-deler fra selgere over hele verden.", category:"Bruktdeler" },
+  { name:"Elring / Victor Reinz", url:"https://www.elring.de", country:"🌐 Internasjonal", description:"Tysk produsent av topplokpakninger og motortettinger. OEM-kvalitet.", category:"OEM deler" },
+  { name:"Hazet Verktøy", url:"https://www.hazet.de", country:"🌐 Internasjonal", description:"Høykvalitets tyske verktøy — mye brukt av BMW-mekanikere.", category:"Verktøy" },
+  { name:"Oscaro.no", url:"https://www.oscaro.no", country:"🇳🇴 Norge", description:"Gode priser på europeiske merkedeler med norsk nettside.", category:"Ettermarked" }
+];
+
+// ===== NAVIGATION =====
+let currentSection = 'hjem';
+function showSection(section) {
+  document.getElementById('hero-section').style.display = 'none';
+  document.getElementById('search-section').classList.remove('active');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-links a, .mobile-nav a').forEach(a => a.classList.remove('active'));
+  if (section === 'hjem') {
+    document.getElementById('hero-section').style.display = 'block';
+  } else {
+    const el = document.getElementById('section-' + section);
+    if (el) el.classList.add('active');
+  }
+  ['nav-','mobile-'].forEach(pre => { const el = document.getElementById(pre+section); if(el) el.classList.add('active'); });
+  currentSection = section;
+  window.scrollTo(0, 0);
+  document.getElementById('global-search').value = '';
+}
+
+// ===== SEARCH =====
+function globalSearch(query) {
+  if (!query || query.trim().length < 2) {
+    document.getElementById('search-section').classList.remove('active');
+    showSection(currentSection);
+    return;
+  }
+  const q = query.toLowerCase();
+  document.getElementById('hero-section').style.display = 'none';
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('search-section').classList.add('active');
+  document.getElementById('search-query-label').textContent = query;
+  let results = [];
+  models.filter(m => (m.name+m.description+m.engine_options).toLowerCase().includes(q))
+    .forEach(m => results.push({ type:'Modell', icon:'🚗', title:m.name, desc:m.description, sub:m.year_range, action:`showSection('modeller')` }));
+  guides.filter(g => (g.title+g.category+g.bmw_models).toLowerCase().includes(q))
+    .forEach(g => results.push({ type:'Guide', icon:'🔧', title:g.title+(g.premium&&!isPremium?' 🔒':''), desc:'🚗 '+g.bmw_models, sub:g.estimated_time, action:g.premium&&!isPremium?`openPaymentModal()`:`openGuide(${guides.indexOf(g)})` }));
+  diagrams.filter(d => (d.title+d.category+d.bmw_models).toLowerCase().includes(q))
+    .forEach(d => results.push({ type:'Tegning', icon:'📐', title:d.title, desc:d.description, sub:d.bmw_models, action:`window.open('${d.source_url}','_blank')` }));
+  parts.filter(p => (p.name+p.category+p.description).toLowerCase().includes(q))
+    .forEach(p => results.push({ type:'Deler', icon:'🛒', title:p.name, desc:p.description, sub:p.country, action:`window.open('${p.url}','_blank')` }));
+  document.getElementById('search-count').textContent = results.length + ' resultat' + (results.length!==1?'er':'');
+  if (!results.length) { document.getElementById('search-results').innerHTML='<div style="text-align:center;padding:3rem;color:var(--text-secondary)">😕 Ingen resultater</div>'; return; }
+  document.getElementById('search-results').innerHTML = `<div class="cards-grid">${results.map(r=>`<div class="card" onclick="${r.action}"><div class="card-badge badge-blue">${r.icon} ${r.type}</div><h3>${r.title}</h3><p>${r.desc}</p><div class="card-meta"><span>📌 ${r.sub}</span></div></div>`).join('')}</div>`;
+}
+
+// ===== RENDER MODELS =====
+function renderModels(filter='alle') {
+  const filtered = filter==='alle'?models:models.filter(m=>m.series===filter);
+  document.getElementById('models-grid').innerHTML = filtered.map(m=>`
+    <div class="model-card">
+      <div class="model-header">
+        <div class="model-series-badge">${m.series}</div>
+        <div class="model-name">${m.name}</div>
+        <div class="model-year">📅 ${m.year_range}</div>
+      </div>
+      <div class="model-body">
+        <p>${m.description}</p>
+        <div class="model-engines"><strong>⚙️ Motoralternativer</strong>${m.engine_options}</div>
+      </div>
+    </div>`).join('');
+}
+function filterModels(filter,btn) { document.querySelectorAll('#model-filters .filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderModels(filter); }
+
+// ===== RENDER DIAGRAMS =====
+function renderDiagrams(filter='alle') {
+  const filtered = filter==='alle'?diagrams:diagrams.filter(d=>d.category===filter);
+  const icons = {'Bremser':'🛑','Motor':'⚙️','Fjæring':'🔩','Transmisjon':'⚡','Karosseri':'🚗','Elektrisk':'💡','Avgassystem':'💨','Kjøling':'🌡️'};
+  document.getElementById('diagrams-grid').innerHTML = filtered.map(d=>`
+    <div class="card">
+      <div class="diagram-preview">${icons[d.category]||'📐'}</div>
+      <div class="card-badge badge-blue">${icons[d.category]||''} ${d.category}</div>
+      <h3>${d.title}</h3>
+      <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.25rem">🚗 ${d.bmw_models}</p>
+      <p>${d.description}</p>
+      <div style="margin-top:1rem"><a href="${d.source_url}" target="_blank" class="btn-primary">🔍 Se deletegning →</a></div>
+    </div>`).join('');
+}
+function filterDiagrams(filter,btn) { btn.closest('.filter-bar').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderDiagrams(filter); }
+
+// ===== RENDER GUIDES =====
+function renderGuides(filter='alle') {
+  const diffBadge = {'Enkel':'badge-green','Middels':'badge-yellow','Avansert':'badge-red'};
+  const catIcons = {'Motor':'⚙️','Bremser':'🛑','Fjæring':'🔩','Elektrisk':'⚡','Elektrikk':'⚡','Kjøling':'🌡️','Transmisjon':'⚙️','Karosseri':'🚗','Annet':'🔧'};
+  let filtered = guides;
+  if (filter.startsWith('cat:')) filtered = guides.filter(g=>g.category===filter.slice(4));
+  else if (filter.startsWith('diff:')) filtered = guides.filter(g=>g.difficulty===filter.slice(5));
+  document.getElementById('guides-grid').innerHTML = filtered.map(g=>{
+    const locked = g.premium && !isPremium;
+    return `<div class="card" onclick="${locked?'openPaymentModal()':'openGuide('+guides.indexOf(g)+')'}">
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.75rem">
+        <span class="card-badge ${diffBadge[g.difficulty]}">${g.difficulty}</span>
+        <span class="card-badge badge-blue">${catIcons[g.category]||'🔧'} ${g.category}</span>
+        ${g.premium?'<span class="card-badge badge-gold">⭐ Premium</span>':''}
+      </div>
+      <h3>${locked?'🔒 ':''} ${g.title}</h3>
+      <p>🚗 ${g.bmw_models}</p>
+      <div class="card-meta">
+        <span>⏱️ ${g.estimated_time}</span>
+        <span>📋 ${g.steps.split('\n').length} steg</span>
+      </div>
+      ${locked?'<div style="margin-top:0.75rem;font-size:0.8rem;color:#f59e0b">Klikk for å låse opp med Premium →</div>':''}
+    </div>`;
+  }).join('');
+}
+function filterGuides(filter,btn) { document.querySelectorAll('#guide-filters .filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderGuides(filter); }
+
+function openGuide(index) {
+  const g = guides[index];
+  if (g.premium && !isPremium) { openPaymentModal(); return; }
+  const diffBadge = {'Enkel':'badge-green','Middels':'badge-yellow','Avansert':'badge-red'};
+  const stepsHtml = g.steps.split('\n').map(s=>`<li>${s.replace(/^\d+\.\s*/,'')}</li>`).join('');
+  document.getElementById('modal-content').innerHTML = `
+    <h2>${g.title}</h2>
+    <div class="modal-badges">
+      <span class="card-badge ${diffBadge[g.difficulty]}">${g.difficulty}</span>
+      <span class="card-badge badge-blue">${g.category}</span>
+      ${g.premium?'<span class="card-badge badge-gold">⭐ Premium</span>':''}
+    </div>
+    <div class="modal-meta">
+      <div class="meta-item"><div class="meta-label">Tidsbruk</div><div class="meta-value">⏱️ ${g.estimated_time}</div></div>
+      <div class="meta-item"><div class="meta-label">Modeller</div><div class="meta-value">🚗 ${g.bmw_models}</div></div>
+      <div class="meta-item"><div class="meta-label">Antall steg</div><div class="meta-value">📋 ${g.steps.split('\n').length}</div></div>
+    </div>
+    <div class="section-block"><h4>🛠️ Verktøy du trenger</h4><p>${g.tools_needed}</p></div>
+    <div class="section-block"><h4>📋 Fremgangsmåte</h4><ol>${stepsHtml}</ol></div>
+    <div class="section-block"><h4>💡 Tips & advarsler</h4><div class="tip-box">${g.tips}</div></div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); document.body.style.overflow = ''; }
+function closeModalOutside(e) { if(e.target===document.getElementById('modal-overlay')) closeModal(); }
+
+// ===== RENDER PARTS =====
+function renderParts(filter='alle') {
+  const filtered = filter==='alle'?parts:parts.filter(p=>p.category===filter);
+  const catBadge = {'OEM deler':'badge-blue','Ettermarked':'badge-green','Bruktdeler':'badge-yellow','Tilbehør':'badge-purple','Verktøy':'badge-orange'};
+  document.getElementById('parts-grid').innerHTML = filtered.map(p=>`
+    <div class="card" style="cursor:default">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem">
+        <span class="card-badge ${catBadge[p.category]||'badge-blue'}">${p.category}</span>
+        <span class="country-flag">${p.country}</span>
+      </div>
+      <h3 style="margin-bottom:0.5rem">${p.name}</h3>
+      <p style="margin-bottom:1rem">${p.description}</p>
+      <a href="${p.url}" target="_blank" class="btn-primary">Besøk nettside →</a>
+    </div>`).join('');
+}
+function filterParts(filter,btn) { btn.closest('.filter-bar').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderParts(filter); }
+
+// ===== ADMIN =====
+function showAdminPanel(id,btn) { document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
+function showSuccess(id) { const el=document.getElementById(id); el.style.display='block'; setTimeout(()=>el.style.display='none',3000); }
+function addGuide() {
+  const title = document.getElementById('g-title').value.trim();
+  if (!title) { alert('Fyll inn tittel!'); return; }
+  guides.push({ title, category:document.getElementById('g-cat').value, difficulty:document.getElementById('g-diff').value, bmw_models:document.getElementById('g-models').value||'Alle', estimated_time:document.getElementById('g-time').value||'Ukjent', tools_needed:document.getElementById('g-tools').value||'Se guide', steps:document.getElementById('g-steps').value||'1. Se fremgangsmåte', tips:document.getElementById('g-tips').value||'', premium:document.getElementById('g-premium').checked });
+  ['g-title','g-models','g-time','g-tools','g-steps','g-tips'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('g-premium').checked=false;
+  showSuccess('g-success'); renderGuides();
+}
+function addModel() {
+  const name=document.getElementById('m-name').value.trim();
+  if(!name){alert('Fyll inn modellnavn!');return;}
+  models.push({name,series:document.getElementById('m-series').value,year_range:document.getElementById('m-year').value||'Ukjent',engine_options:document.getElementById('m-engines').value||'Se spesifikasjoner',description:document.getElementById('m-desc').value||''});
+  ['m-name','m-year','m-engines','m-desc'].forEach(id=>document.getElementById(id).value='');
+  showSuccess('m-success'); renderModels();
+}
+function addDiagram() {
+  const title=document.getElementById('d-title').value.trim();
+  if(!title){alert('Fyll inn tittel!');return;}
+  diagrams.push({title,category:document.getElementById('d-cat').value,bmw_models:document.getElementById('d-models').value||'Ukjent',source_url:document.getElementById('d-url').value||'#',description:document.getElementById('d-desc').value||''});
+  ['d-title','d-models','d-url','d-desc'].forEach(id=>document.getElementById(id).value='');
+  showSuccess('d-success'); renderDiagrams();
+}
+function addPart() {
+  const name=document.getElementById('p-name').value.trim();
+  if(!name){alert('Fyll inn butikknavn!');return;}
+  parts.push({name,category:document.getElementById('p-cat').value,url:document.getElementById('p-url').value||'#',country:document.getElementById('p-country').value||'🌐 Internasjonal',description:document.getElementById('p-desc').value||''});
+  ['p-name','p-url','p-country','p-desc'].forEach(id=>document.getElementById(id).value='');
+  showSuccess('p-success'); renderParts();
+}
+
+
+// ===== SKILTOPPSLAG =====
+const BILOPPSLAG_URL = 'https://superagent-c1939af0.base44.app/functions/biloppslag';
+
+let minBil = null;
+
+function lastMinBilFraStorage() {
+  try {
+    const stored = localStorage.getItem('bmw_minbil');
+    if (stored) {
+      minBil = JSON.parse(stored);
+      visMinBil(minBil);
+    }
+  } catch {}
+}
+
+async function slåOppBil() {
+  const regnrRaw = document.getElementById('regnr-input').value.trim().replace(/\s/g,'');
+  if (!regnrRaw) { visRegnrFeil('Skriv inn et registreringsnummer!'); return; }
+
+  const btn = document.getElementById('regnr-btn');
+  const loading = document.getElementById('regnr-loading');
+  const errorEl = document.getElementById('regnr-error');
+  btn.disabled = true;
+  loading.style.display = 'flex';
+  errorEl.style.display = 'none';
+  document.getElementById('bil-resultat').style.display = 'none';
+  document.getElementById('regnr-intro').style.display = 'none';
+
+  try {
+    const res = await fetch(BILOPPSLAG_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ regnr: regnrRaw })
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      // If API key not set, do a client-side model match
+      if (data.tip) {
+        visRegnrFeil('⚠️ Vegvesen API-nøkkel ikke satt opp ennå. Vi prøver lokal matching...');
+        const lokal = lokalBilMatch(regnrRaw);
+        if (lokal) { visMinBil(lokal); return; }
+      }
+      visRegnrFeil(data.error || 'Kunne ikke hente bilinfo');
+      document.getElementById('regnr-intro').style.display = 'block';
+      return;
+    }
+
+    if (!data.erBMW) {
+      visRegnrFeil(`🚫 ${data.regnr} er registrert som ${data.merke || 'ukjent merke'} — ikke en BMW. Prøv et annet nummer!`);
+      document.getElementById('regnr-intro').style.display = 'block';
+      return;
+    }
+
+    minBil = data;
+    localStorage.setItem('bmw_minbil', JSON.stringify(data));
+    visMinBil(data);
+  } catch (e) {
+    visRegnrFeil('Feil ved oppslag: ' + e.message);
+    document.getElementById('regnr-intro').style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    loading.style.display = 'none';
+  }
+}
+
+function lokalBilMatch(regnr) {
+  // Simple local demo — show generic BMW info
+  return {
+    regnr,
+    merke: 'BMW',
+    modell: 'Ukjent modell',
+    årsmodell: null,
+    farge: 'Ukjent',
+    drivstoff: 'Ukjent',
+    effektHk: null,
+    euKontrollFrist: null,
+    erBMW: true,
+    lokalt: true
+  };
+}
+
+function visMinBil(data) {
+  document.getElementById('bil-resultat').style.display = 'block';
+  document.getElementById('regnr-intro').style.display = 'none';
+  document.getElementById('regnr-clear').style.display = 'inline-flex';
+
+  const eu = data.euKontrollFrist ? new Date(data.euKontrollFrist) : null;
+  const euStatus = eu ? (eu < new Date() ? '🔴 Utløpt!' : eu < new Date(Date.now()+90*24*60*60*1000) ? '🟡 Snart' : '🟢 OK') : '—';
+  const euTekst = eu ? `${euStatus} ${eu.toLocaleDateString('nb-NO')}` : '—';
+
+  document.getElementById('bil-kort').innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem">
+      <div>
+        <div class="bil-skilt">${data.regnr}</div>
+        <div style="font-size:1.5rem;font-weight:800;color:#fff">${data.merke} ${data.modell}</div>
+        ${data.årsmodell ? `<div style="color:var(--text-secondary);margin-top:4px">Årsmodell ${data.årsmodell}</div>` : ''}
+        ${data.lokalt ? '<div style="color:#f59e0b;font-size:0.8rem;margin-top:6px">⚠️ Begrenset info — API-nøkkel ikke konfigurert</div>' : ''}
+      </div>
+      <div style="font-size:4rem">🚗</div>
+    </div>
+    <div class="bil-info-grid">
+      ${data.farge && data.farge!=='Ukjent' ? `<div class="bil-info-item"><div class="bil-info-label">🎨 Farge</div><div class="bil-info-value">${data.farge}</div></div>` : ''}
+      ${data.drivstoff && data.drivstoff!=='Ukjent' ? `<div class="bil-info-item"><div class="bil-info-label">⛽ Drivstoff</div><div class="bil-info-value">${data.drivstoff}</div></div>` : ''}
+      ${data.effektHk ? `<div class="bil-info-item"><div class="bil-info-label">⚡ Effekt</div><div class="bil-info-value">${data.effektHk} hk</div></div>` : ''}
+      ${data.slagvolum ? `<div class="bil-info-item"><div class="bil-info-label">🔩 Slagvolum</div><div class="bil-info-value">${(data.slagvolum/1000).toFixed(1)}L</div></div>` : ''}
+      ${eu ? `<div class="bil-info-item"><div class="bil-info-label">🔧 EU-kontroll</div><div class="bil-info-value" style="font-size:0.85rem">${euTekst}</div></div>` : ''}
+    </div>
+  `;
+
+  // Finn relevante guider basert på modell/årsmodell
+  const modellStr = (data.modell + ' ' + (data.årsmodell||'')).toLowerCase();
+  const bmwKoder = ['e46','e90','e91','e92','e60','e61','f10','f30','e87','e39','e53','e70','e38','e46','f32'];
+  const matchedGuides = guides.filter(g => {
+    const gStr = (g.bmw_models||'').toLowerCase();
+    return gStr.includes('alle') || bmwKoder.some(k => gStr.includes(k)) || true; // show all when no VIN match
+  });
+
+  document.getElementById('bil-guider-seksjon').innerHTML = `
+    <div class="bil-action-section" style="margin-bottom:1.5rem">
+      <h3>🔧 Reparasjonsguider for din BMW</h3>
+      <div class="cards-grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">
+        ${matchedGuides.slice(0,6).map(g => {
+          const locked = g.premium && !isPremium;
+          const idx = guides.indexOf(g);
+          const diffBadge = {'Enkel':'badge-green','Middels':'badge-yellow','Avansert':'badge-red'};
+          return `<div class="card" onclick="${locked?'openPaymentModal()':'openGuide('+idx+')'}">
+            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.5rem">
+              <span class="card-badge ${diffBadge[g.difficulty]}">${g.difficulty}</span>
+              ${g.premium?'<span class="card-badge badge-gold">⭐ Premium</span>':''}
+            </div>
+            <h3 style="font-size:0.95rem">${locked?'🔒 ':''}${g.title}</h3>
+            <div class="card-meta"><span>⏱️ ${g.estimated_time}</span></div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="margin-top:1rem"><button class="btn-secondary" onclick="showSection('guider')">Se alle guider →</button></div>
+    </div>
+  `;
+
+  document.getElementById('bil-tegninger-seksjon').innerHTML = `
+    <div class="bil-action-section">
+      <h3>📐 Deletegninger for BMW</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem">
+        ${diagrams.slice(0,4).map(d => `
+          <div class="card" onclick="window.open('${d.source_url}','_blank')" style="padding:1rem">
+            <div class="card-badge badge-blue" style="margin-bottom:0.5rem">${d.category}</div>
+            <h3 style="font-size:0.9rem">${d.title}</h3>
+          </div>`).join('')}
+      </div>
+      <div style="margin-top:1rem"><button class="btn-secondary" onclick="showSection('tegninger')">Se alle tegninger →</button></div>
+    </div>
+  `;
+}
+
+function visRegnrFeil(msg) {
+  const el = document.getElementById('regnr-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function nullstillBil() {
+  minBil = null;
+  localStorage.removeItem('bmw_minbil');
+  document.getElementById('regnr-input').value = '';
+  document.getElementById('bil-resultat').style.display = 'none';
+  document.getElementById('regnr-error').style.display = 'none';
+  document.getElementById('regnr-intro').style.display = 'block';
+  document.getElementById('regnr-clear').style.display = 'none';
+}
+
+// INIT
+checkPremium();
+renderModels(); renderDiagrams(); renderGuides(); renderParts();
+lastMinBilFraStorage();
+
+
+// ===== BMW CHAT ASSISTANT =====
+let chatOpen = false;
+let chatHistory = [];
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const win = document.getElementById('bmw-chat-window');
+  const badge = document.getElementById('chat-badge');
+  if (chatOpen) {
+    win.classList.add('open');
+    if (badge) badge.style.display = 'none';
+    const inp = document.getElementById('chat-input');
+    if (inp) inp.focus();
+    // Reposition window relative to button
+    (function() {
+      var btn = document.getElementById('bmw-chat-btn');
+      if (!btn || !win) return;
+      var sz = btn.offsetWidth || 56;
+      var ww = Math.min(360, window.innerWidth - 16);
+      var wh = 500;
+      var rect = btn.getBoundingClientRect();
+      var nl = rect.left;
+      var nt = rect.top;
+      var wt = nt - wh - 12;
+      if (wt < 8) wt = nt + sz + 12;
+      if (wt + wh > window.innerHeight - 8) wt = window.innerHeight - wh - 8;
+      var wl = Math.max(8, Math.min(nl + sz/2 - ww/2, window.innerWidth - ww - 8));
+      win.style.left   = wl + 'px';
+      win.style.top    = Math.max(8, wt) + 'px';
+      win.style.right  = 'auto';
+      win.style.bottom = 'auto';
+      win.style.width  = ww + 'px';
+    })();
+  } else {
+    win.classList.remove('open');
+  }
+}
+
+function addChatMessage(text, sender) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + sender;
+  div.innerHTML = '<div class="chat-bubble">' + text.replace(/\n/g,'<br>') + '</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTypingIndicator() {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg bot';
+  div.id = 'typing-indicator';
+  div.innerHTML = '<div class="chat-bubble chat-typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTypingIndicator() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function sendSuggestion(text) {
+  const sugg = document.getElementById('chat-suggestions');
+  if (sugg) sugg.style.display = 'none';
+  const input = document.getElementById('chat-input');
+  if (input) input.value = text;
+  sendChat();
+}
+
+function getBMWLocalResponse(q) {
+  q = q.toLowerCase();
+  if (q.includes('e46')) return 'BMW E46 (1998-2006) er en klassiker! Vanlige problemer: subramme-rust, kjølevannspumpe (bytt ved 80.000 km) og VANOS-problemer på M54-motoren. Sjekk guidene under Motor-kategorien!';
+  if (q.includes('e90') || q.includes('e91') || q.includes('e92')) return 'BMW E90 (2005-2012): Pass på N47 dieselkjede (rabling = bytt snart!), kjølevæsketermostat og oljenivå. Vi har guider for de vanligste problemene!';
+  if (q.includes('e60') || q.includes('e61')) return 'BMW E60/E61 (2003-2010): Vanlige problemer er IBS-sensor på batteri, luftfjæring (E61), og N47/N57 turboproblemer. Husk å kode nytt batteri!';
+  if (q.includes('bremse')) return 'Bremser bør sjekkes årlig. Skivene byttes når de er under minimumtykkelse. Vi har steg-for-steg guider for bremseklosser og skiver under Bremser-kategorien!';
+  if (q.includes('olje')) return 'BMW anbefaler 5W-30 eller 0W-30 fulsyntetisk (Longlife 04). Oljeskift bør gjøres hvert 15.000 km – ikke vent på CBS! Se motorguiden for steg-for-steg.';
+  if (q.includes('p0') || q.includes('feilkode') || q.includes('obd')) return 'Feilkoder leses best med INPA, ISTA eller Carly. P0300 = tenningssvikt, P0171/P0174 = mager blanding. Se vår OBD2-guide under Elektrikk!';
+  if (q.includes('turbo')) return 'BMW-turboer varer typisk 150-250.000 km. Symptomer: hvit/blå røyk, nedsatt effekt, piping. La alltid motoren varme opp og kjøle ned ordentlig!';
+  if (q.includes('kjøl') || q.includes('temperatur') || q.includes('overoppheting')) return 'Overoppheting er alvorlig – stopp umiddelbart! Sjekk kjølevæskenivå, termostat og vannpumpe. BMW-kjølesystem bør spyles hvert 3. år. Se kjøleguidene!';
+  if (q.includes('batteri') || q.includes('frm') || q.includes('cas')) return 'Nytt batteri på BMW MÅ kodes inn (IBS-sensor). Bruk INPA, ISTA eller Carly. FRM-modulproblemer gir blinkende lys og vinduer som ikke virker – se el-guidene!';
+  if (q.includes('premium')) return 'Med Premium (99 kr/mnd) får du alle avanserte guider: turbobytte, toppakning, injektorer, FRM/CAS-moduler og mye mer. Klikk Oppgrader i menyen!';
+  if (q.includes('hei') || q.includes('hallo') || q.includes('hi ')) return 'Hei! Hva kan jeg hjelpe med i dag? Spør om BMW-modeller, reparasjoner, vedlikehold eller feilkoder! 🚗';
+  if (q.includes('takk') || q.includes('tusen takk')) return 'Bare hyggelig! Lykke til med BMW-en 🚗 Kom gjerne tilbake hvis du lurer på noe!';
+  return 'Godt spørsmål! Sjekk gjerne guidene i appen under riktig kategori. Du kan også spørre mer spesifikt om modell eller problem, så hjelper jeg deg!';
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  const sugg = document.getElementById('chat-suggestions');
+  if (sugg) sugg.style.display = 'none';
+
+  addChatMessage(text, 'user');
+  chatHistory.push({ role: 'user', content: text });
+  showTypingIndicator();
+
+  await new Promise(r => setTimeout(r, 600 + Math.random() * 600));
+  removeTypingIndicator();
+  const reply = getBMWLocalResponse(text);
+  chatHistory.push({ role: 'assistant', content: reply });
+  addChatMessage(reply, 'bot');
+}
+</script>
+
+<script>
+// PWA Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('https://base44.app/api/apps/6a1423940cbb3bbcc1939af0/files/mp/public/6a1423940cbb3bbcc1939af0/b45f29825_sw.js').then(reg => {
+      console.log('SW registered');
+    }).catch(err => console.log('SW error:', err));
+  });
+}
+
+// Install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').style.display = 'flex';
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choice) => {
+      deferredPrompt = null;
+      document.getElementById('install-banner').style.display = 'none';
+    });
+  }
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').style.display = 'none';
+});
+
+
+// BMW Chat Assistant
+let chatOpen = false;
+let chatHistory = [];
+
+const BMW_KNOWLEDGE = {
+  greetings: ['hei','hallo','hi','heisann','god dag'],
+  farewells: ['ha det','takk','adjø','bye'],
+};
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const win = document.getElementById('bmw-chat-window');
+  const badge = document.getElementById('chat-badge');
+  if (chatOpen) {
+    win.classList.add('open');
+    badge.style.display = 'none';
+    document.getElementById('chat-input').focus();
+  } else {
+    win.classList.remove('open');
+  }
+}
+
+function addMessage(text, sender) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + sender;
+  div.innerHTML = '<div class="chat-bubble">' + text.replace(/\n/g,'<br>') + '</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg bot';
+  div.id = 'typing-indicator';
+  div.innerHTML = '<div class="chat-bubble chat-typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function sendSuggestion(text) {
+  document.getElementById('chat-suggestions').style.display = 'none';
+  document.getElementById('chat-input').value = text;
+  sendChat();
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('chat-suggestions').style.display = 'none';
+
+  addMessage(text, 'user');
+  chatHistory.push({ role: 'user', content: text });
+  showTyping();
+
+  try {
+    const systemPrompt = `Du er en ekspert BMW-mekaniker og rådgiver for BMW Owners Hub-appen. 
+Du hjelper brukere med spørsmål om BMW-modeller, reparasjoner, vedlikehold, feilkoder og tekniske problemer.
+Svar alltid på norsk. Vær presis, praktisk og vennlig. Hold svarene korte (2-4 setninger) med mindre brukeren ber om detaljer.
+Appen har guider for: Motor, Bremser, Fjæring, Kjøling, Elektrikk og mer.
+Har du info om modeller som E46, E90, E60, E87, F30, F10 og X-serien.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer OPENAI_KEY_PLACEHOLDER'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...chatHistory.slice(-8)
+        ],
+        max_tokens: 300,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) throw new Error('API error');
+    const data = await response.json();
+    const reply = data.choices[0].message.content;
+    chatHistory.push({ role: 'assistant', content: reply });
+    removeTyping();
+    addMessage(reply, 'bot');
+  } catch(e) {
+    removeTyping();
+    // Fallback: local smart responses
+    const reply = getBMWLocalResponse(text.toLowerCase());
+    chatHistory.push({ role: 'assistant', content: reply });
+    addMessage(reply, 'bot');
+  }
+}
+
+function getBMWLocalResponse(q) {
+  if (q.includes('e46')) return 'BMW E46 (1998-2006) er en klassiker! Vanlige problemer: subramme-rust, kjølevannspumpe (bytt ved 80.000 km), ventilasjonsdeksel-pakning og M54-motoren er kjent for VANOS-problemer. Sjekk guidene våre under Motor-kategorien!';
+  if (q.includes('e90') || q.includes('e91') || q.includes('e92')) return 'BMW E90 (2005-2012) er robust! Pass på: N46/N52 oljepumpe, kjølevæsketermostat og bremseskloss-indikatorer. Dieselmodellene (N47) har kjent kjededrivsproblemer – bytt kjede ved tegn på rabling!';
+  if (q.includes('bremse')) return 'Bremser på BMW bør sjekkes hvert år. Skivene bør byttes når de er under minimum tykkelse (se stempel på skiven). Vi har guider for bremseklosser og -skiver under Bremser-kategorien!';
+  if (q.includes('olje')) return 'BMW anbefaler 5W-30 eller 0W-30 fulsyntetisk olje (Longlife 04). Oljeskift bør gjøres hvert 15.000 km eller 1 år – ikke vent på CBS-indikatoren! Sjekk motorguiden for steg-for-steg.';
+  if (q.includes('p0') || q.includes('feilkode')) return 'Feilkoder på BMW leses best med INPA, ISTA eller en OBD2-leser med BMW-støtte (f.eks. Carly). P0300 = tenningssvikt, P0171/P0174 = mager blanding. Vi har en OBD2-guide under Elektrikk!';
+  if (q.includes('turbo')) return 'BMW N47/N57 turboer varer typisk 150-250.000 km. Symptomer på slitt turbo: hvit/blå røyk, nedsatt effekt, piping. Bruk alltid god motorolje og la motoren varme opp/kjøle ned ordentlig!';
+  if (q.includes('kjøl') || q.includes('temperatur') || q.includes('overoppheting')) return 'Overoppheting er alvorlig! Stopp umiddelbart. Sjekk: kjølevæskenivå, termostat og vannpumpe. BMW-kjølesystem bør spyles hvert 3. år. Vi har en kjøleguide i appen!';
+  if (q.includes('premium')) return 'Med Premium-abonnement (99 kr/mnd) får du tilgang til alle avanserte reparasjonsguider, inkludert turbobytte, toppakning, injektorer og mye mer. Klikk på Oppgrader-knappen i menyen!';
+  if (BMW_KNOWLEDGE.greetings.some(g => q.includes(g))) return 'Hei! Hva kan jeg hjelpe deg med i dag? Spør gjerne om BMW-modeller, reparasjoner, vedlikehold eller feilkoder! 🚗';
+  return 'Godt spørsmål! Sjekk gjerne guidene i appen under riktig kategori. Har du et mer spesifikt spørsmål om modell eller problem?';
+}
+
+
+
+
+
+
+
+</script>
+
+<!-- Install Banner -->
+<div id="install-banner" style="display:none; position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); background:#1a1a2e; border:1px solid rgba(28,105,212,0.5); border-radius:16px; padding:1rem 1.5rem; z-index:999; align-items:center; gap:1rem; box-shadow:0 8px 32px rgba(0,0,0,0.5); max-width:380px; width:calc(100% - 2rem);">
+  <img src="https://base44.app/api/apps/6a1423940cbb3bbcc1939af0/files/mp/public/6a1423940cbb3bbcc1939af0/754f6a2a7_icon-192.png" style="width:44px;height:44px;border-radius:10px;" alt="icon">
+  <div style="flex:1;">
+    <div style="font-weight:700;font-size:0.95rem;color:#fff;">BMW Owners Hub</div>
+    <div style="font-size:0.8rem;color:#a0a0a0;">Installer som app på telefonen</div>
+  </div>
+  <button onclick="installApp()" style="background:linear-gradient(135deg,#1c69d4,#1557b0);color:#fff;border:none;padding:8px 16px;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.85rem;">Installer</button>
+  <button onclick="document.getElementById('install-banner').style.display='none'" style="background:rgba(255,255,255,0.08);color:#a0a0a0;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem;">×</button>
+</div>
+
+<!-- BMW AI Chat -->
+<button id="bmw-chat-btn" title="Spør BMW-assistenten">
+  🤖
+  <span class="chat-badge" id="chat-badge" style="display:none">1</span>
+</button>
+
+<script>
+// Drag for chat button - runs immediately after button is in DOM
+(function initChatDrag() {
+  var btn = document.getElementById('bmw-chat-btn');
+  if (!btn) { setTimeout(initChatDrag, 100); return; }
+
+  var dragging = false, moved = false;
+  var ox, oy, bx, by;
+
+  btn.style.cursor = 'grab';
+  btn.style.userSelect = 'none';
+  btn.style.webkitUserSelect = 'none';
+  btn.style.touchAction = 'none';
+  btn.style.position = 'fixed';
+
+  function toTopLeft() {
+    var r = btn.getBoundingClientRect();
+    btn.style.left = r.left + 'px';
+    btn.style.top  = r.top  + 'px';
+    btn.style.right  = 'auto';
+    btn.style.bottom = 'auto';
+  }
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function pos(e) {
+    return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                     : { x: e.clientX, y: e.clientY };
+  }
+
+  function start(e) {
+    toTopLeft();
+    var p = pos(e);
+    dragging = true; moved = false;
+    ox = p.x; oy = p.y;
+    bx = parseFloat(btn.style.left);
+    by = parseFloat(btn.style.top);
+    btn.style.cursor = 'grabbing';
+    btn.style.transition = 'none';
+  }
+
+  function positionWindow() {
+    var w = document.getElementById('bmw-chat-window');
+    if (!w) return;
+    var sz = btn.offsetWidth || 56;
+    var ww = 360;
+    var wh = 500;
+    var nl = parseFloat(btn.style.left) || (window.innerWidth - sz - 24);
+    var nt = parseFloat(btn.style.top)  || (window.innerHeight - sz - 88);
+    // Prefer above button
+    var wt = nt - wh - 12;
+    // If not enough space above, go below
+    if (wt < 8) wt = nt + sz + 12;
+    // If still off screen below, clamp
+    if (wt + wh > window.innerHeight - 8) wt = window.innerHeight - wh - 8;
+    var wl = clamp(nl + sz/2 - ww/2, 8, window.innerWidth - ww - 8);
+    w.style.left   = wl + 'px';
+    w.style.top    = Math.max(8, wt) + 'px';
+    w.style.right  = 'auto';
+    w.style.bottom = 'auto';
+    w.style.width  = Math.min(ww, window.innerWidth - 16) + 'px';
+  }
+
+  function move(e) {
+    if (!dragging) return;
+    if (e.cancelable) e.preventDefault();
+    var p = pos(e);
+    var dx = p.x - ox, dy = p.y - oy;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+    var sz = btn.offsetWidth || 56, m = 10;
+    btn.style.left = clamp(bx + dx, m, window.innerWidth  - sz - m) + 'px';
+    btn.style.top  = clamp(by + dy, m, window.innerHeight - sz - m) + 'px';
+    positionWindow();
+  }
+
+  function end() {
+    if (!dragging) return;
+    dragging = false;
+    btn.style.cursor = 'grab';
+    btn.style.transition = '';
+    try {
+      localStorage.setItem('cb-l', btn.style.left);
+      localStorage.setItem('cb-t', btn.style.top);
+    } catch(e){}
+    if (!moved) toggleChat();
+  }
+
+  btn.addEventListener('mousedown',  start);
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup',   end);
+  btn.addEventListener('touchstart', start, {passive:true});
+  document.addEventListener('touchmove', move, {passive:false});
+  document.addEventListener('touchend',  end);
+
+  // Restore position
+  try {
+    var l = localStorage.getItem('cb-l'), t = localStorage.getItem('cb-t');
+    if (l && t) {
+      btn.style.left = l; btn.style.top = t;
+      btn.style.right = 'auto'; btn.style.bottom = 'auto';
+    }
+  } catch(e){}
+})();
+
+// ===== AUTH SYSTEM =====
+const API = 'https://superagent-c1939af0.base44.app/functions';
+let currentUser = null;
+
+function initAuth() {
+  // Check for reset token in URL
+  const params = new URLSearchParams(window.location.search);
+  const resetToken = params.get('reset_token');
+  if (resetToken) {
+    window.__resetToken = resetToken;
+    openAuthModal('reset');
+    window.history.replaceState({}, '', window.location.pathname);
+    return;
+  }
+  // Check saved session
+  try {
+    const saved = localStorage.getItem('bmw_user');
+    if (saved) {
+      const data = JSON.parse(saved);
+      const tokenData = JSON.parse(atob(data.token));
+      if (tokenData.exp > Date.now()) {
+        currentUser = data.user;
+        updateNavAuth();
+        if (data.user.is_premium) activatePremium(false);
+      } else {
+        localStorage.removeItem('bmw_user');
+      }
+    }
+  } catch(e) {}
+}
+
+function openAuthModal(form) {
+  document.getElementById('auth-modal').style.display = 'flex';
+  if (form === 'reset') showResetForm();
+  else showLoginForm();
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal').style.display = 'none';
+}
+
+function showLoginForm() {
+  document.getElementById('auth-login-form').style.display = 'block';
+  document.getElementById('auth-register-form').style.display = 'none';
+  document.getElementById('auth-forgot-form').style.display = 'none';
+  document.getElementById('auth-reset-form').style.display = 'none';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+function showRegisterForm() {
+  document.getElementById('auth-login-form').style.display = 'none';
+  document.getElementById('auth-register-form').style.display = 'block';
+  document.getElementById('auth-forgot-form').style.display = 'none';
+  document.getElementById('auth-reset-form').style.display = 'none';
+  document.getElementById('reg-error').style.display = 'none';
+}
+
+function showForgotForm() {
+  document.getElementById('auth-login-form').style.display = 'none';
+  document.getElementById('auth-register-form').style.display = 'none';
+  document.getElementById('auth-forgot-form').style.display = 'block';
+  document.getElementById('auth-reset-form').style.display = 'none';
+}
+
+function showResetForm() {
+  document.getElementById('auth-login-form').style.display = 'none';
+  document.getElementById('auth-register-form').style.display = 'none';
+  document.getElementById('auth-forgot-form').style.display = 'none';
+  document.getElementById('auth-reset-form').style.display = 'block';
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+
+  if (!email || !password) { errEl.textContent = 'Fyll inn e-post og passord'; errEl.style.display = 'block'; return; }
+
+  try {
+    const res = await fetch(API + '/authLogin', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) { errEl.textContent = data.error || 'Innlogging feilet'; errEl.style.display = 'block'; return; }
+
+    currentUser = data.user;
+    localStorage.setItem('bmw_user', JSON.stringify({ token: data.token, user: data.user }));
+    updateNavAuth();
+    if (data.user.is_premium) activatePremium(false);
+    closeAuthModal();
+    showToast('Velkommen tilbake, ' + (data.user.full_name || data.user.email) + '! 👋');
+  } catch(e) {
+    errEl.textContent = 'Nettverksfeil, prøv igjen'; errEl.style.display = 'block';
+  }
+}
+
+async function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const errEl = document.getElementById('reg-error');
+  errEl.style.display = 'none';
+
+  if (!email || !password) { errEl.textContent = 'Fyll inn e-post og passord'; errEl.style.display = 'block'; return; }
+  if (password.length < 8) { errEl.textContent = 'Passordet må være minst 8 tegn'; errEl.style.display = 'block'; return; }
+
+  try {
+    const res = await fetch(API + '/authRegister', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email, password, full_name: name })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) { errEl.textContent = data.error || 'Registrering feilet'; errEl.style.display = 'block'; return; }
+
+    currentUser = data.user;
+    localStorage.setItem('bmw_user', JSON.stringify({ token: data.token, user: data.user }));
+    updateNavAuth();
+    closeAuthModal();
+    showToast('Konto opprettet! Velkommen, ' + (data.user.full_name || data.user.email) + '! 🎉');
+  } catch(e) {
+    errEl.textContent = 'Nettverksfeil, prøv igjen'; errEl.style.display = 'block';
+  }
+}
+
+async function doForgotPassword() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const msgEl = document.getElementById('forgot-msg');
+
+  if (!email) { msgEl.textContent = 'Fyll inn e-post'; msgEl.style.color = '#ff6b6b'; msgEl.style.display = 'block'; return; }
+
+  try {
+    await fetch(API + '/authForgotPassword', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email, app_url: window.location.origin + window.location.pathname })
+    });
+    msgEl.textContent = '✅ Sjekk e-posten din! (Kan ta noen minutter)';
+    msgEl.style.color = '#4ade80';
+    msgEl.style.display = 'block';
+  } catch(e) {
+    msgEl.textContent = 'Nettverksfeil, prøv igjen'; msgEl.style.color = '#ff6b6b'; msgEl.style.display = 'block';
+  }
+}
+
+async function doResetPassword() {
+  const pw = document.getElementById('reset-password').value;
+  const pw2 = document.getElementById('reset-password2').value;
+  const msgEl = document.getElementById('reset-msg');
+
+  if (!pw || pw.length < 8) { msgEl.textContent = 'Passordet må være minst 8 tegn'; msgEl.style.color = '#ff6b6b'; msgEl.style.display = 'block'; return; }
+  if (pw !== pw2) { msgEl.textContent = 'Passordene stemmer ikke'; msgEl.style.color = '#ff6b6b'; msgEl.style.display = 'block'; return; }
+
+  try {
+    const res = await fetch(API + '/authResetPassword', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ token: window.__resetToken, new_password: pw })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) { msgEl.textContent = data.error; msgEl.style.color = '#ff6b6b'; msgEl.style.display = 'block'; return; }
+
+    msgEl.textContent = '✅ Passord oppdatert! Logg inn med nytt passord.';
+    msgEl.style.color = '#4ade80';
+    msgEl.style.display = 'block';
+    setTimeout(() => showLoginForm(), 2000);
+  } catch(e) {
+    msgEl.textContent = 'Nettverksfeil, prøv igjen'; msgEl.style.color = '#ff6b6b'; msgEl.style.display = 'block';
+  }
+}
+
+function logoutUser() {
+  currentUser = null;
+  localStorage.removeItem('bmw_user');
+  updateNavAuth();
+  isPremium = false;
+  document.getElementById('premium-nav-btn').style.display = 'inline-flex';
+  showToast('Du er nå logget ut 👋');
+}
+
+function updateNavAuth() {
+  const btn = document.getElementById('nav-auth-btn');
+  const info = document.getElementById('nav-user-info');
+  const nameEl = document.getElementById('nav-user-name');
+  if (currentUser) {
+    btn.style.display = 'none';
+    info.style.display = 'flex';
+    nameEl.textContent = '👤 ' + (currentUser.full_name || currentUser.email);
+    if (currentUser.is_premium) {
+      document.getElementById('premium-nav-btn').style.display = 'none';
+    }
+  } else {
+    btn.style.display = 'inline-block';
+    info.style.display = 'none';
+  }
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast-msg');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast-msg';
+    t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1c69d4;color:#fff;padding:12px 24px;border-radius:30px;z-index:99999;font-size:14px;pointer-events:none;transition:opacity 0.3s;white-space:nowrap;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
+}
+
+// Init on load
+window.addEventListener('DOMContentLoaded', initAuth);
+// ===== END AUTH =====
+
+</script>
+
+<div id="bmw-chat-window">
+  <div class="chat-header">
+    <div class="chat-header-avatar">🤖</div>
+    <div class="chat-header-info">
+      <strong>BMW Assistent</strong>
+      <span>● Online</span>
+    </div>
+    <button class="chat-close-btn" onclick="toggleChat()">×</button>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-msg bot">
+      <div class="chat-bubble">Hei! Jeg er BMW-assistenten din 🚗<br>Spør meg om modeller, reparasjoner, feilkoder eller hva du lurer på!</div>
+    </div>
+  </div>
+  <div class="chat-suggestions" id="chat-suggestions">
+    <button class="chat-suggestion-chip" onclick="sendSuggestion('Hva er vanlige feil på E46?')">Vanlige feil E46</button>
+    <button class="chat-suggestion-chip" onclick="sendSuggestion('Hvordan bytte bremseklossene?')">Bytte bremser</button>
+    <button class="chat-suggestion-chip" onclick="sendSuggestion('Hva betyr feilkode P0300?')">Feilkode P0300</button>
+  </div>
+  <div class="chat-input-area">
+    <textarea class="chat-input" id="chat-input" placeholder="Spør om BMW..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+    <button class="chat-send-btn" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+</body>
+</html>
