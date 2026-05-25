@@ -1657,7 +1657,7 @@ function initAuth() {
       if (tokenData.exp > Date.now()) {
         currentUser = data.user;
         updateNavAuth();
-        if (data.user.is_premium) activatePremium(false);
+        if (data.user.is_premium) { isPremium = true; localStorage.setItem('bmw_premium','1'); updatePremiumUI(); }
         // Always fetch fresh premium status from server in background
         fetch(API + '/authRefresh', {
           method: 'POST',
@@ -1669,7 +1669,7 @@ function initAuth() {
             data.user = fresh.user;
             localStorage.setItem('bmw_user', JSON.stringify(data));
             updateNavAuth();
-            if (fresh.user.is_premium && !isPremium) activatePremium(false);
+            if (fresh.user.is_premium && !isPremium) { isPremium = true; localStorage.setItem('bmw_premium','1'); updatePremiumUI(); }
           }
         }).catch(() => {});
       } else {
@@ -1738,7 +1738,7 @@ async function doLogin() {
     currentUser = data.user;
     localStorage.setItem('bmw_user', JSON.stringify({ token: data.token, user: data.user }));
     updateNavAuth();
-    if (data.user.is_premium) activatePremium(false);
+    if (data.user.is_premium) { isPremium = true; localStorage.setItem('bmw_premium','1'); updatePremiumUI(); }
     closeAuthModal();
     showToast('Velkommen tilbake, ' + (data.user.full_name || data.user.email) + '! 👋');
   } catch(e) {
