@@ -1742,7 +1742,8 @@ async function doLogin() {
     closeAuthModal();
     showToast('Velkommen tilbake, ' + (data.user.full_name || data.user.email) + '! 👋');
   } catch(e) {
-    errEl.innerHTML = 'Nettverksfeil – <a href="javascript:location.reload(true)" style="color:#f59e0b">trykk her for å laste på nytt</a>'; errEl.style.display = 'block';
+    errEl.innerHTML = 'Feil: ' + e.message + ' – <a href="javascript:location.reload(true)" style="color:#f59e0b">last inn på nytt</a>'; errEl.style.display = 'block';
+    console.error('Login error:', e);
   }
 }
 
