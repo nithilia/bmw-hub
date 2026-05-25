@@ -703,6 +703,16 @@
 
 <script>
 // ===== PREMIUM STATE =====
+// Force clear old service workers and caches
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(r => { console.log('Unregistering SW:', r.scope); r.unregister(); });
+  });
+  if ('caches' in window) {
+    caches.keys().then(names => names.forEach(n => caches.delete(n)));
+  }
+}
+
 let isPremium = false;
 
 
@@ -1732,7 +1742,7 @@ async function doLogin() {
     closeAuthModal();
     showToast('Velkommen tilbake, ' + (data.user.full_name || data.user.email) + '! 👋');
   } catch(e) {
-    errEl.textContent = 'Nettverksfeil, prøv igjen'; errEl.style.display = 'block';
+    errEl.innerHTML = 'Nettverksfeil – <a href="javascript:location.reload(true)" style="color:#f59e0b">trykk her for å laste på nytt</a>'; errEl.style.display = 'block';
   }
 }
 
@@ -1760,7 +1770,7 @@ async function doRegister() {
     closeAuthModal();
     showToast('Konto opprettet! Velkommen, ' + (data.user.full_name || data.user.email) + '! 🎉');
   } catch(e) {
-    errEl.textContent = 'Nettverksfeil, prøv igjen'; errEl.style.display = 'block';
+    errEl.innerHTML = 'Nettverksfeil – <a href="javascript:location.reload(true)" style="color:#f59e0b">trykk her for å laste på nytt</a>'; errEl.style.display = 'block';
   }
 }
 
