@@ -1637,7 +1637,7 @@ function initAuth() {
     window.history.replaceState({}, '', window.location.pathname);
     return;
   }
-  // Check saved session
+  // Check saved session and refresh premium status from server
   try {
     const saved = localStorage.getItem('bmw_user');
     if (saved) {
@@ -1647,6 +1647,20 @@ function initAuth() {
         currentUser = data.user;
         updateNavAuth();
         if (data.user.is_premium) activatePremium(false);
+        // Always fetch fresh premium status from server in background
+        fetch(API + '/authRefresh', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: data.token })
+        }).then(r => r.json()).then(fresh => {
+          if (fresh && fresh.user) {
+            currentUser = fresh.user;
+            data.user = fresh.user;
+            localStorage.setItem('bmw_user', JSON.stringify(data));
+            updateNavAuth();
+            if (fresh.user.is_premium && !isPremium) activatePremium(false);
+          }
+        }).catch(() => {});
       } else {
         localStorage.removeItem('bmw_user');
       }
