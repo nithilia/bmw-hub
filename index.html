@@ -606,6 +606,7 @@
         </div>
         <button class="btn-primary" onclick="addGuide()">➕ Legg til guide</button>
         <div class="success-msg" id="g-success">✅ Guide lagt til!</div>
+        <div id="guide-list" style="margin-top:1.5rem"></div>
       </div>
     </div>
     <div class="admin-panel" id="model-panel">
@@ -622,6 +623,7 @@
         <div class="form-group" style="margin-bottom:1rem"><label>Beskrivelse</label><textarea id="m-desc"></textarea></div>
         <button class="btn-primary" onclick="addModel()">➕ Legg til modell</button>
         <div class="success-msg" id="m-success">✅ Modell lagt til!</div>
+        <div id="model-list" style="margin-top:1.5rem"></div>
       </div>
     </div>
     <div class="admin-panel" id="diagram-panel">
@@ -638,6 +640,7 @@
         <div class="form-group" style="margin-bottom:1rem"><label>Beskrivelse</label><textarea id="d-desc"></textarea></div>
         <button class="btn-primary" onclick="addDiagram()">➕ Legg til tegning</button>
         <div class="success-msg" id="d-success">✅ Tegning lagt til!</div>
+        <div id="diagram-list" style="margin-top:1.5rem"></div>
       </div>
     </div>
     <div class="admin-panel" id="parts-panel">
@@ -654,6 +657,7 @@
         <div class="form-group" style="margin-bottom:1rem"><label>Beskrivelse</label><textarea id="p-desc"></textarea></div>
         <button class="btn-primary" onclick="addPart()">➕ Legg til butikk</button>
         <div class="success-msg" id="p-success">✅ Butikk lagt til!</div>
+        <div id="parts-list" style="margin-top:1.5rem"></div>
       </div>
     </div>
   </div>
@@ -893,6 +897,9 @@ function showSection(section) {
   document.getElementById('search-section').classList.remove('active');
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-links a, .mobile-nav a').forEach(a => a.classList.remove('active'));
+  if (section === 'admin') {
+    setTimeout(() => { loadAdminList('guide'); }, 100);
+  }
   if (section === 'hjem') {
     document.getElementById('hero-section').style.display = 'block';
   } else {
@@ -1036,36 +1043,150 @@ function renderParts(filter='alle') {
 function filterParts(filter,btn) { btn.closest('.filter-bar').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderParts(filter); }
 
 // ===== ADMIN =====
-function showAdminPanel(id,btn) { document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
+function showAdminPanel(id,btn) {
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  const typeMap = {'guide-panel':'guide','model-panel':'model','diagram-panel':'diagram','parts-panel':'parts'};
+  if (typeMap[id]) loadAdminList(typeMap[id]);
+}
 function showSuccess(id) { const el=document.getElementById(id); el.style.display='block'; setTimeout(()=>el.style.display='none',3000); }
 function addGuide() {
   const title = document.getElementById('g-title').value.trim();
   if (!title) { alert('Fyll inn tittel!'); return; }
-  guides.push({ title, category:document.getElementById('g-cat').value, difficulty:document.getElementById('g-diff').value, bmw_models:document.getElementById('g-models').value||'Alle', estimated_time:document.getElementById('g-time').value||'Ukjent', tools_needed:document.getElementById('g-tools').value||'Se guide', steps:document.getElementById('g-steps').value||'1. Se fremgangsmåte', tips:document.getElementById('g-tips').value||'', premium:document.getElementById('g-premium').checked });
-  ['g-title','g-models','g-time','g-tools','g-steps','g-tips'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('g-premium').checked=false;
-  showSuccess('g-success'); renderGuides();
+  const data = {
+    title,
+    category: document.getElementById('g-cat').value,
+    difficulty: document.getElementById('g-diff').value,
+    bmw_models: document.getElementById('g-models').value || 'Alle',
+    estimated_time: document.getElementById('g-time').value || 'Ukjent',
+    tools_needed: document.getElementById('g-tools').value || 'Se guide',
+    steps: document.getElementById('g-steps').value || '1. Se fremgangsmåte',
+    tips: document.getElementById('g-tips').value || '',
+    is_premium: document.getElementById('g-premium').checked
+  };
+  const token = localStorage.getItem('bmw_token');
+  fetch(API + '/adminSave', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token},
+    body: JSON.stringify({ entity: 'RepairGuide', data })
+  }).then(r => r.json()).then(res => {
+    if (res.id || res.success) {
+      ['g-title','g-models','g-time','g-tools','g-steps','g-tips'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('g-premium').checked = false;
+      showSuccess('g-success');
+      loadAdminList('guide');
+    } else { alert('Feil: ' + (res.error || 'Ukjent feil')); }
+  }).catch(() => alert('Nettverksfeil'));
 }
 function addModel() {
-  const name=document.getElementById('m-name').value.trim();
-  if(!name){alert('Fyll inn modellnavn!');return;}
-  models.push({name,series:document.getElementById('m-series').value,year_range:document.getElementById('m-year').value||'Ukjent',engine_options:document.getElementById('m-engines').value||'Se spesifikasjoner',description:document.getElementById('m-desc').value||''});
-  ['m-name','m-year','m-engines','m-desc'].forEach(id=>document.getElementById(id).value='');
-  showSuccess('m-success'); renderModels();
+  const name = document.getElementById('m-name').value.trim();
+  if (!name) { alert('Fyll inn modellnavn!'); return; }
+  const data = {
+    name,
+    series: document.getElementById('m-series').value,
+    year_range: document.getElementById('m-year').value || 'Ukjent',
+    engine_options: document.getElementById('m-engines').value || 'Se spesifikasjoner',
+    description: document.getElementById('m-desc').value || ''
+  };
+  const token = localStorage.getItem('bmw_token');
+  fetch(API + '/adminSave', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token},
+    body: JSON.stringify({ entity: 'BMWModel', data })
+  }).then(r => r.json()).then(res => {
+    if (res.id || res.success) {
+      ['m-name','m-year','m-engines','m-desc'].forEach(id => document.getElementById(id).value = '');
+      showSuccess('m-success');
+      loadAdminList('model');
+    } else { alert('Feil: ' + (res.error || 'Ukjent feil')); }
+  }).catch(() => alert('Nettverksfeil'));
 }
 function addDiagram() {
-  const title=document.getElementById('d-title').value.trim();
-  if(!title){alert('Fyll inn tittel!');return;}
-  diagrams.push({title,category:document.getElementById('d-cat').value,bmw_models:document.getElementById('d-models').value||'Ukjent',source_url:document.getElementById('d-url').value||'#',description:document.getElementById('d-desc').value||''});
-  ['d-title','d-models','d-url','d-desc'].forEach(id=>document.getElementById(id).value='');
-  showSuccess('d-success'); renderDiagrams();
+  const title = document.getElementById('d-title').value.trim();
+  if (!title) { alert('Fyll inn tittel!'); return; }
+  const data = {
+    title,
+    category: document.getElementById('d-cat').value,
+    bmw_models: document.getElementById('d-models').value || 'Ukjent',
+    source_url: document.getElementById('d-url').value || '#',
+    description: document.getElementById('d-desc').value || ''
+  };
+  const token = localStorage.getItem('bmw_token');
+  fetch(API + '/adminSave', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token},
+    body: JSON.stringify({ entity: 'PartsExplosionDiagram', data })
+  }).then(r => r.json()).then(res => {
+    if (res.id || res.success) {
+      ['d-title','d-models','d-url','d-desc'].forEach(id => document.getElementById(id).value = '');
+      showSuccess('d-success');
+      loadAdminList('diagram');
+    } else { alert('Feil: ' + (res.error || 'Ukjent feil')); }
+  }).catch(() => alert('Nettverksfeil'));
 }
 function addPart() {
-  const name=document.getElementById('p-name').value.trim();
-  if(!name){alert('Fyll inn butikknavn!');return;}
-  parts.push({name,category:document.getElementById('p-cat').value,url:document.getElementById('p-url').value||'#',country:document.getElementById('p-country').value||'🌐 Internasjonal',description:document.getElementById('p-desc').value||''});
-  ['p-name','p-url','p-country','p-desc'].forEach(id=>document.getElementById(id).value='');
-  showSuccess('p-success'); renderParts();
+  const name = document.getElementById('p-name').value.trim();
+  if (!name) { alert('Fyll inn butikknavn!'); return; }
+  const data = {
+    name,
+    category: document.getElementById('p-cat').value,
+    url: document.getElementById('p-url').value || '#',
+    country: document.getElementById('p-country').value || 'Internasjonal',
+    description: document.getElementById('p-desc').value || ''
+  };
+  const token = localStorage.getItem('bmw_token');
+  fetch(API + '/adminSave', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token},
+    body: JSON.stringify({ entity: 'PartsLink', data })
+  }).then(r => r.json()).then(res => {
+    if (res.id || res.success) {
+      ['p-name','p-url','p-country','p-desc'].forEach(id => document.getElementById(id).value = '');
+      showSuccess('p-success');
+      loadAdminList('parts');
+    } else { alert('Feil: ' + (res.error || 'Ukjent feil')); }
+  }).catch(() => alert('Nettverksfeil'));
+}
+
+function loadAdminList(type) {
+  const token = localStorage.getItem('bmw_token');
+  const entityMap = { guide: 'RepairGuide', model: 'BMWModel', diagram: 'PartsExplosionDiagram', parts: 'PartsLink' };
+  const entity = entityMap[type];
+  const listId = type + '-list';
+  const listEl = document.getElementById(listId);
+  if (!listEl) return;
+  listEl.innerHTML = '<p style=\'color:var(--text-secondary);font-size:0.85rem\'>Laster...</p>';
+  fetch(API + '/adminList', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token},
+    body: JSON.stringify({ entity })
+  }).then(r => r.json()).then(res => {
+    if (!res.records || res.records.length === 0) {
+      listEl.innerHTML = '<p style=\'color:var(--text-secondary);font-size:0.85rem\'>Ingen poster ennå.</p>';
+      return;
+    }
+    listEl.innerHTML = res.records.map(r => \`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:rgba(255,255,255,0.04);border-radius:8px;margin-bottom:0.4rem">
+        <span style="font-size:0.9rem;color:var(--text-primary)">\${r.name || r.title || r.id}</span>
+        <button onclick="deleteAdminRecord('\${entity}','\${r.id}','\${type}')" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.8rem">🗑️ Slett</button>
+      </div>
+    \`).join('');
+  }).catch(() => { listEl.innerHTML = '<p style=\'color:#ef4444;font-size:0.85rem\'>Feil ved lasting.</p>'; });
+}
+
+function deleteAdminRecord(entity, id, type) {
+  if (!confirm('Slette denne posten?')) return;
+  const token = localStorage.getItem('bmw_token');
+  fetch(API + '/adminDelete', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token},
+    body: JSON.stringify({ entity, id })
+  }).then(r => r.json()).then(res => {
+    if (res.success) loadAdminList(type);
+    else alert('Feil ved sletting');
+  }).catch(() => alert('Nettverksfeil'));
 }
 
 
