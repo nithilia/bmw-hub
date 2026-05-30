@@ -1169,12 +1169,12 @@ function loadAdminList(type) {
       listEl.innerHTML = '<p style=\'color:var(--text-secondary);font-size:0.85rem\'>Ingen poster ennå.</p>';
       return;
     }
-    listEl.innerHTML = res.records.map(r => \`
+    listEl.innerHTML = res.records.map(r => `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:rgba(255,255,255,0.04);border-radius:8px;margin-bottom:0.4rem">
         <span style="font-size:0.9rem;color:var(--text-primary)">\${r.name || r.title || r.id}</span>
         <button onclick="deleteAdminRecord('\${entity}','\${r.id}','\${type}')" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.8rem">🗑️ Slett</button>
       </div>
-    \`).join('');
+    `).join('');
   }).catch(() => { listEl.innerHTML = '<p style=\'color:#ef4444;font-size:0.85rem\'>Feil ved lasting.</p>'; });
 }
 
